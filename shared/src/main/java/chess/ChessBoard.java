@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.HashMap;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -7,9 +9,15 @@ package chess;
  * signature of the existing methods.
  */
 public class ChessBoard {
-    private ChessPiece[][] board;
+    private HashMap<String, ChessPiece> board;
     public ChessBoard() {
-        board = new ChessPiece[8][8];
+        board = new HashMap<>();
+        for(int r = 1; r < 9; r++){
+            for(int c = 1; c < 9; c++){
+                String key = Integer.toString(r) + Integer.toString(c);
+                board.put(key, null);
+            }
+        }
     }
 
     /**
@@ -19,9 +27,9 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        board[position.getRow()][position.getColumn()] = piece;
-
-        return;
+        String key = Integer.toString(position.getRow()) + Integer.toString(position.getColumn());
+        board.put(key, piece);
+        System.out.println(boardToString());
     }
 
     /**
@@ -32,7 +40,8 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return board[position.getRow()][position.getColumn()];
+        String key = Integer.toString(position.getRow()) + Integer.toString(position.getColumn());
+        return board.get(key);
     }
 
     /**
@@ -41,5 +50,26 @@ public class ChessBoard {
      */
     public void resetBoard() {
         throw new RuntimeException("Not implemented");
+    }
+
+    private String boardToString(){
+        String str = "";
+        ChessPosition pos;
+
+        for(int r = 8; r > 0; r--){
+            str += "|";
+            for(int c = 1; c < 9; c++) {
+                pos = new ChessPosition(r, c);
+                if (getPiece(pos) == null) {
+                    str += " ";
+                } else {
+                    str += "B";
+                }
+                str += "|";
+            }
+            str += "\n";
+        }
+
+        return str;
     }
 }
