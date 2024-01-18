@@ -79,6 +79,7 @@ public class ChessPiece {
                     break;
                 }
 
+                System.out.println("row: " + moveRow + ", col: " + moveCol);
                 moves.add(new ChessMove(myPosition, movePosition, null));
                 if(piece != null){
                     break;
@@ -100,6 +101,7 @@ public class ChessPiece {
                     break;
                 }
 
+                System.out.println("row: " + moveRow + ", col: " + moveCol);
                 moves.add(new ChessMove(myPosition, movePosition, null));
                 if(piece != null){
                     break;
@@ -121,6 +123,7 @@ public class ChessPiece {
                     break;
                 }
 
+                System.out.println("row: " + moveRow + ", col: " + moveCol);
                 moves.add(new ChessMove(myPosition, movePosition, null));
                 if(piece != null){
                     break;
@@ -142,6 +145,7 @@ public class ChessPiece {
                     break;
                 }
 
+                System.out.println("row: " + moveRow + ", col: " + moveCol);
                 moves.add(new ChessMove(myPosition, movePosition, null));
                 if(piece != null){
                     break;

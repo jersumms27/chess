@@ -29,7 +29,6 @@ public class ChessBoard {
     public void addPiece(ChessPosition position, ChessPiece piece) {
         String key = Integer.toString(position.getRow()) + Integer.toString(position.getColumn());
         board.put(key, piece);
-        System.out.println(boardToString());
     }
 
     /**
