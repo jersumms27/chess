@@ -10,12 +10,12 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessBoard {
-    private HashMap<String, ChessPiece> board;
+    private HashMap<ChessPosition, ChessPiece> board;
     public ChessBoard() {
         board = new HashMap<>();
         for(int r = 1; r < 9; r++){
             for(int c = 1; c < 9; c++){
-                String key = Integer.toString(r) + Integer.toString(c);
+                ChessPosition key = new ChessPosition(r, c);
                 board.put(key, null);
             }
         }
@@ -28,8 +28,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        String key = Integer.toString(position.getRow()) + Integer.toString(position.getColumn());
-        board.put(key, piece);
+        board.put(position, piece);
     }
 
     /**
@@ -40,8 +39,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        String key = Integer.toString(position.getRow()) + Integer.toString(position.getColumn());
-        return board.get(key);
+        return board.get(position);
     }
 
     /**
