@@ -108,16 +108,7 @@ public class ChessBoard {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessBoard that = (ChessBoard) o;
-        for (int r = 1; r <= 8; r++){
-            for (int c = 1; c <= 8; c++){
-                ChessPosition pos = new ChessPosition(r, c);
-                if (!Objects.equals(getPiece(pos), that.getPiece(pos))){
-                    return false;
-                }
-            }
-        }
-
-        return true;
+        return Objects.deepEquals(board, that.board);
     }
 
     @Override
