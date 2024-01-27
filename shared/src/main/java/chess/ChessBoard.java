@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -82,26 +84,6 @@ public class ChessBoard {
 
     }
 
-    private String boardToString(){
-        String str = "";
-        ChessPosition pos;
-
-        for(int r = 8; r > 0; r--){
-            str += "|";
-            for(int c = 1; c < 9; c++) {
-                pos = new ChessPosition(r, c);
-                if (getPiece(pos) == null) {
-                    str += " ";
-                } else {
-                    str += "B";
-                }
-                str += "|";
-            }
-            str += "\n";
-        }
-
-        return str;
-    }
 
     @Override
     public boolean equals(Object o) {
