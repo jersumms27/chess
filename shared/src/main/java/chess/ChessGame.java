@@ -12,16 +12,17 @@ import java.util.HashMap;
  */
 public class ChessGame {
     private ChessBoard board;
+    private TeamColor teamTurn;
 
     public ChessGame() {
-
+        teamTurn = TeamColor.WHITE;
     }
 
     /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        throw new RuntimeException("Not implemented");
+       return teamTurn;
     }
 
     /**
@@ -30,7 +31,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
+        teamTurn = team;
     }
 
     /**
@@ -49,7 +50,15 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = board.getPiece(startPosition);
+
+        //illegal if piece cannot move there
+        Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
+
+        //illegal if move puts king in check
+        ChessBoard futureBoard = board.clone();
+
+        return moves;
     }
 
     /**
@@ -59,7 +68,21 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        ChessPosition startPos = move.getStartPosition();
+        ChessPiece piece = board.getPiece(startPos);
+
+        //check if invalid move
+        if (piece == null || piece.getTeamColor() != teamTurn) {
+            throw new InvalidMoveException("Invalid move");
+        }
+        else if (!validMoves(startPos).contains(move)) {
+            throw new InvalidMoveException("Invalid move");
+        }
+
+        //make the actual move
+        ChessPosition movePos = move.getEndPosition();
+        board.addPiece(movePos, piece);
+        board.addPiece(startPos, null);
     }
 
     /**

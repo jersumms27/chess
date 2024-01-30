@@ -11,7 +11,7 @@ import java.util.Objects;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessBoard {
+public class ChessBoard implements Cloneable{
     private HashMap<ChessPosition, ChessPiece> board;
     public ChessBoard() {
         board = new HashMap<>();
@@ -42,6 +42,11 @@ public class ChessBoard {
      */
     public ChessPiece getPiece(ChessPosition position) {
         return board.get(position);
+    }
+
+    public void movePiece(ChessMove move, ChessPiece piece) {
+        addPiece(move.getEndPosition(), piece);
+        board.put(move.getStartPosition(), null);
     }
 
     /**
@@ -85,6 +90,8 @@ public class ChessBoard {
     }
 
 
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -96,5 +103,17 @@ public class ChessBoard {
     @Override
     public int hashCode() {
         return Objects.hash(board);
+    }
+
+    @Override
+    public ChessBoard clone() {
+        try {
+            ChessBoard clone = (ChessBoard) super.clone();
+            // TODO: copy mutable state here, so the clone can't change the internals of the original
+            clone.board = board;
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }
