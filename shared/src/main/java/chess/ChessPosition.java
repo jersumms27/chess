@@ -32,6 +32,15 @@ public class ChessPosition {
         return col;
     }
 
+    public String toString() {
+        String output = "";
+        output += "row = " + row;
+        output += ", ";
+        output += "col = " + col;
+
+        return output;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

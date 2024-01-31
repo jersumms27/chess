@@ -11,7 +11,7 @@ import java.util.Objects;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessBoard implements Cloneable{
+public class ChessBoard {
     private HashMap<ChessPosition, ChessPiece> board;
     public ChessBoard() {
         board = new HashMap<>();
@@ -44,9 +44,12 @@ public class ChessBoard implements Cloneable{
         return board.get(position);
     }
 
-    public void movePiece(ChessMove move, ChessPiece piece) {
-        addPiece(move.getEndPosition(), piece);
-        board.put(move.getStartPosition(), null);
+    public void movePiece(ChessMove move) {
+        ChessPosition startPos = move.getStartPosition();
+        ChessPosition movePos = move.getEndPosition();
+        ChessPiece piece = getPiece(startPos);
+        addPiece(movePos, piece);
+        addPiece(startPos, null);
     }
 
     /**
@@ -89,8 +92,46 @@ public class ChessBoard implements Cloneable{
 
     }
 
+    public String toString() {
+        String nullChar = " ";
+        HashMap<ChessPiece.PieceType, String> blackSymbols = new HashMap<>();
+        blackSymbols.put(ChessPiece.PieceType.PAWN, "p");
+        blackSymbols.put(ChessPiece.PieceType.ROOK, "r");
+        blackSymbols.put(ChessPiece.PieceType.KNIGHT, "n");
+        blackSymbols.put(ChessPiece.PieceType.BISHOP, "b");
+        blackSymbols.put(ChessPiece.PieceType.QUEEN, "q");
+        blackSymbols.put(ChessPiece.PieceType.KING, "k");
 
+        HashMap<ChessPiece.PieceType, String> whiteSymbols = new HashMap<>();
+        whiteSymbols.put(ChessPiece.PieceType.PAWN, "P");
+        whiteSymbols.put(ChessPiece.PieceType.ROOK, "R");
+        whiteSymbols.put(ChessPiece.PieceType.KNIGHT, "N");
+        whiteSymbols.put(ChessPiece.PieceType.BISHOP, "B");
+        whiteSymbols.put(ChessPiece.PieceType.QUEEN, "Q");
+        whiteSymbols.put(ChessPiece.PieceType.KING, "K");
 
+        String output = "";
+        for (int r = 8; r >= 1; r--) {
+            output += "|";
+            for (int c = 1; c <= 8; c++) {
+                ChessPosition pos = new ChessPosition(r, c);
+                ChessPiece piece = getPiece(pos);
+                if (piece == null) {
+                    output += nullChar;
+                }
+                else if (piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
+                    output += blackSymbols.get(piece.getPieceType());
+                }
+                else if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                    output += whiteSymbols.get(piece.getPieceType());
+                }
+                output += "|";
+            }
+            output += "\n";
+        }
+
+        return output;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -103,17 +144,5 @@ public class ChessBoard implements Cloneable{
     @Override
     public int hashCode() {
         return Objects.hash(board);
-    }
-
-    @Override
-    public ChessBoard clone() {
-        try {
-            ChessBoard clone = (ChessBoard) super.clone();
-            // TODO: copy mutable state here, so the clone can't change the internals of the original
-            clone.board = board;
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
     }
 }

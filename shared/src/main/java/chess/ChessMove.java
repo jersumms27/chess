@@ -33,6 +33,10 @@ public class ChessMove {
         return endPos;
     }
 
+    public ChessMove getReverseMove() {
+        return new ChessMove(endPos, startPos, null);
+    }
+
     /**
      * Gets the type of piece to promote a pawn to if pawn promotion is part of this
      * chess move
@@ -41,6 +45,16 @@ public class ChessMove {
      */
     public ChessPiece.PieceType getPromotionPiece() {
         return promPiece;
+    }
+
+    public String toString() {
+        String output = "";
+        output += "start:\n";
+        output += startPos.toString();
+        output += "\nend:\n";
+        output += endPos.toString() + "\n";
+
+        return output;
     }
 
     @Override

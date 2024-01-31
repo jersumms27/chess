@@ -60,34 +60,35 @@ public class ChessPiece {
         int[][] knightDirs = {{2, 1}, {2, -1}, {1, -2}, {-1, -2}, {-2, -1}, {-2, 1}, {-1, 2}, {1, 2}};
 
         if (type == PieceType.ROOK){
-            moves.addAll(calculateMoves(board, myPos, moves, straightDirs, 8));
+            moves.addAll(calculateMoves(board, myPos, straightDirs, 8));
         }
         else if (type == PieceType.KNIGHT){
-            moves.addAll(calculateMoves(board, myPos, moves, knightDirs, 1));
+            moves.addAll(calculateMoves(board, myPos, knightDirs, 1));
         }
         else if (type == PieceType.BISHOP){
-            moves.addAll(calculateMoves(board, myPos, moves, diagonalDirs, 8));
+            moves.addAll(calculateMoves(board, myPos, diagonalDirs, 8));
         }
         else if (type == PieceType.QUEEN){
-            moves.addAll(calculateMoves(board, myPos, moves, straightAndDiagonalDirs, 8));
+            moves.addAll(calculateMoves(board, myPos, straightAndDiagonalDirs, 8));
         }
         else if (type == PieceType.KING){
-            moves.addAll(calculateMoves(board, myPos, moves, straightAndDiagonalDirs, 1));
+            moves.addAll(calculateMoves(board, myPos, straightAndDiagonalDirs, 1));
         }
         else if (type == PieceType.PAWN){
-            moves.addAll(movePawn(board, myPos, moves));
+            moves.addAll(movePawn(board, myPos));
         }
 
         return moves;
     }
 
-    private Collection<ChessMove> calculateMoves(ChessBoard board, ChessPosition myPos, Collection<ChessMove> moves, int[][] dirs, int numMoves){
+    private Collection<ChessMove> calculateMoves(ChessBoard board, ChessPosition myPos, int[][] dirs, int numMoves){
         int myRow = myPos.getRow();
         int myCol = myPos.getColumn();
         int moveRow;
         int moveCol;
         ChessPosition movePos;
         ChessPiece piece;
+        ArrayList<ChessMove> moves = new ArrayList<>();
 
         int numDirs = dirs.length;
 
@@ -113,12 +114,13 @@ public class ChessPiece {
         return moves;
     }
 
-    private Collection<ChessMove> movePawn(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves) {
+    private Collection<ChessMove> movePawn(ChessBoard board, ChessPosition myPosition) {
         int myRow = myPosition.getRow();
         int myCol = myPosition.getColumn();
         int moveRow;
         int moveCol;
         ChessPosition movePos;
+        ArrayList<ChessMove> moves = new ArrayList<>();
 
         int promoteRow;
         int forward;
@@ -160,10 +162,10 @@ public class ChessPiece {
 
         //Forward/right
         moveRow = myRow + forward;
-        moveCol = myRow + 1;
+        moveCol = myCol + 1;
         movePos = new ChessPosition(moveRow, moveCol);
 
-        if (!outOfBounds(moveRow, moveCol)&& board.getPiece(movePos) != null && board.getPiece(movePos).getTeamColor() != color){
+        if (!outOfBounds(moveRow, moveCol) && board.getPiece(movePos) != null && board.getPiece(movePos).getTeamColor() != color){
             if (myRow == promoteRow) {
                 moves.add(new ChessMove(myPosition, movePos, PieceType.ROOK));
                 moves.add(new ChessMove(myPosition, movePos, PieceType.KNIGHT));
@@ -176,9 +178,9 @@ public class ChessPiece {
         }
 
         //Forward/left
-        moveCol = myRow - 1;
+        moveCol = myCol - 1;
         movePos= new ChessPosition(moveRow, moveCol);
-        if (moveRow > 0 && moveRow < 9 && moveCol > 0 && moveCol < 9 && board.getPiece(movePos) != null && board.getPiece(movePos).getTeamColor() != color){
+        if (!outOfBounds(moveRow, moveCol) && board.getPiece(movePos) != null && board.getPiece(movePos).getTeamColor() != color){
             if (myRow == promoteRow) {
                 moves.add(new ChessMove(myPosition, movePos, PieceType.ROOK));
                 moves.add(new ChessMove(myPosition, movePos, PieceType.KNIGHT));
