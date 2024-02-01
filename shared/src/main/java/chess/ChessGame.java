@@ -71,8 +71,6 @@ public class ChessGame {
             ChessPiece captured = board.getPiece(move.getEndPosition());
             board.movePiece(move);
             if (!isInCheck(color)) {
-                System.out.println(color + " king is not in check");
-                System.out.println(board.toString());
                 legalMoves.add(move);
             }
             board.movePiece(move.getReverseMove());
