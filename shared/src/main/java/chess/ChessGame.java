@@ -35,6 +35,14 @@ public class ChessGame {
         teamTurn = team;
     }
 
+    private void changeTeamTurn() {
+        if (teamTurn == TeamColor.BLACK) {
+            setTeamTurn(TeamColor.WHITE);
+        } else {
+            setTeamTurn(TeamColor.BLACK);
+        }
+    }
+
     /**
      * Enum identifying the 2 possible teams in a chess game
      */
@@ -57,6 +65,15 @@ public class ChessGame {
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
 
         //illegal if move puts king in check
+        for (ChessMove move: moves) {
+            ChessPiece captured = board.getPiece(move.getEndPosition());
+            board.movePiece(move);
+            if (isInCheck(teamTurn)) {
+                moves.remove(move);
+            }
+            board.movePiece(move.getReverseMove());
+            board.addPiece(move.getEndPosition(), captured);
+        }
 
         return moves;
     }
@@ -68,19 +85,20 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        System.out.println(teamTurn + "'s turn");
         ChessPosition startPos = move.getStartPosition();
         ChessPiece piece = board.getPiece(startPos);
 
         //check if invalid move
-        if (piece == null || piece.getTeamColor() != teamTurn) {
-            throw new InvalidMoveException("Invalid move");
-        }
-        else if (!validMoves(startPos).contains(move)) {
+        if (piece == null || piece.getTeamColor() != teamTurn || !validMoves(startPos).contains(move)) {
+            System.out.println(move.toString() + " is NOT a valid move");
             throw new InvalidMoveException("Invalid move");
         }
 
         //make the actual move
+        System.out.println(move.toString() + " is a valid move");
         board.movePiece(move);
+        changeTeamTurn();
     }
 
     /**
@@ -90,6 +108,7 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
+        System.out.println(board.toString());
         //get position of king
         ChessPosition kingPos = null;
 
@@ -113,6 +132,10 @@ public class ChessGame {
                 col = 1;
             } else {
                 col ++;
+            }
+
+            if (row == 8 && col == 8) {
+                return false;
             }
         }
 
@@ -174,11 +197,10 @@ public class ChessGame {
                 col ++;
             }
         }
-        System.out.println(board.toString());
+
         for (ChessMove move: piece.pieceMoves(board, kingPos)) {
             ChessPiece captured = board.getPiece(move.getEndPosition());
             board.movePiece(move);
-            System.out.println(board.toString());
             if (!isInCheck(teamColor)) {
                 board.movePiece(move.getReverseMove());
                 board.addPiece(move.getEndPosition(), captured);
