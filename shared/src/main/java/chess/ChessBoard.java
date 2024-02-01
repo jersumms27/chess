@@ -48,6 +48,10 @@ public class ChessBoard {
         ChessPosition startPos = move.getStartPosition();
         ChessPosition movePos = move.getEndPosition();
         ChessPiece piece = getPiece(startPos);
+        if (move.getPromotionPiece() != null) {
+            piece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
+        }
+
         addPiece(movePos, piece);
         addPiece(startPos, null);
     }
