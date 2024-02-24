@@ -1,6 +1,7 @@
 package dataAccess;
 
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 
 import java.util.ArrayList;
@@ -20,7 +21,12 @@ public class MemoryUserDAO implements UserDAO {
     }
 
     @Override
-    public UserData getUser(UserData data) throws DataAccessException {
-        return null;
+    public UserData getUser(String username) throws DataAccessException {
+        for (UserData user: users) {
+            if (username.equals(user.username())) {
+                return user;
+            }
+        }
+        throw new DataAccessException("User not found");
     }
 }
