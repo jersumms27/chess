@@ -1,14 +1,10 @@
 package dataAccess;
 
-import model.AuthData;
-import model.GameData;
 import model.UserData;
-
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 
 public class MemoryUserDAO implements UserDAO {
-    private final Collection<UserData> users = new ArrayList<>();
+    private final HashMap<String, UserData> users = new HashMap<>();
 
     @Override
     public void clear() {
@@ -17,15 +13,13 @@ public class MemoryUserDAO implements UserDAO {
 
     @Override
     public void createUser(UserData data) {
-        users.add(data);
+        users.put(data.username(), data);
     }
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
-        for (UserData user: users) {
-            if (username.equals(user.username())) {
-                return user;
-            }
+        if(users.containsKey(username)) {
+            return users.get(username);
         }
         throw new DataAccessException("User not found");
     }

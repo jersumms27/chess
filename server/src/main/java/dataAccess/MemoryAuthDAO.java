@@ -1,12 +1,10 @@
 package dataAccess;
 
 import model.AuthData;
-
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 
 public class MemoryAuthDAO implements AuthDAO {
-    private final Collection<AuthData> auths = new ArrayList<>();
+    private final HashMap<String, AuthData> auths = new HashMap<>();
 
     @Override
     public void clear() {
@@ -14,21 +12,29 @@ public class MemoryAuthDAO implements AuthDAO {
     }
 
     @Override
-    public AuthData createAuth(String username) {
+    public AuthData createAuth(String username) throws DataAccessException {
+        if(auths.containsKey(username)) {
+            throw new DataAccessException("Auth token already created");
+        }
         String token = "";
         AuthData newData = new AuthData(token, username);
-        auths.add(newData);
-
+        auths.put(username, newData);
         return newData;
     }
 
     @Override
-    public AuthData getAuth(AuthData data) {
-        return data;
+    public String getAuth(String username) throws DataAccessException {
+        if(!auths.containsKey(username)) {
+            throw new DataAccessException("Auth token not yet created");
+        }
+        return auths.get(username).authToken();
     }
 
     @Override
-    public void deleteAuth(AuthData data) {
-        auths.remove(data);
+    public void deleteAuth(AuthData data) throws DataAccessException {
+        if(!auths.containsValue(data)) {
+            throw new DataAccessException("Auth token not found");
+        }
+        auths.remove(data.username());
     }
 }

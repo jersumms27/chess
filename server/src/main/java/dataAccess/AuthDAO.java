@@ -4,7 +4,7 @@ import model.*;
 
 public interface AuthDAO {
     void clear();
-    AuthData createAuth(String username);
-    AuthData getAuth(AuthData data);
-    void deleteAuth(AuthData data);
+    AuthData createAuth(String username) throws DataAccessException;
+    String getAuth(String data) throws DataAccessException;
+    void deleteAuth(AuthData data) throws DataAccessException;
 }
