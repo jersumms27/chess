@@ -1,6 +1,7 @@
 package service;
 
 import dataAccess.*;
+import model.GameData;
 
 public class GameService {
     AuthDAO authDAO;
@@ -12,19 +13,51 @@ public class GameService {
         this.gameDAO = gameDAO;
     }
 
-    // parameter:
+    // parameter: authToken
     // return: list of games
-    public ListGamesResponse listGames() {
-        return null;
+    public ListGamesResponse listGames(ListGamesRequest request) {
+        //Verify authToken
+        try {
+            authDAO.verifyAuth(request.authToken());
+        } catch (DataAccessException ex) {
+            return new ListGamesResponse(null, "Error: unauthorized");
+        }
+
+        return new ListGamesResponse(gameDAO.listGames(), null);
     }
 
     // parameter: gameName
     // return: gameID
     public CreateGameResponse createGame(CreateGameRequest request) {
-        return null;
+        //Verify authToken
+        try {
+            authDAO.verifyAuth(request.authToken());
+        } catch (DataAccessException ex) {
+            return new CreateGameResponse(null, "Error: unauthorized"); //[401]
+        }
+
+        return new CreateGameResponse(String.valueOf((gameDAO.createGame(request.gameName()).gameID())), null);
     }
 
-    public void joinGame(JoinGameRequest request) {
+    // parameter: authToken, playerColor, gameID
+    // return:
+    public JoinGameResponse joinGame(JoinGameRequest request) {
+        GameData gameData;
+        //Verify authToken
+        try {
+            authDAO.verifyAuth(request.authToken());
+        } catch (DataAccessException ex) {
+            return new JoinGameResponse("Error: unauthorized"); //[401]
+        }
+        //Check if game exists
+        try {
+            gameData = gameDAO.getGame(Integer.parseInt(request.gameID()));
+        } catch (DataAccessException ex2) {
+            return new JoinGameResponse("Error: bad request"); //[400]
+        }
+        //Check if color is taken
+        if (request.playerColor() != null) {
 
+        }
     }
 }

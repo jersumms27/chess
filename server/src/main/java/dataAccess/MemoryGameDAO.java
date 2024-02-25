@@ -8,6 +8,7 @@ import java.util.Collection;
 
 public class MemoryGameDAO implements GameDAO {
     private final Collection<GameData> games = new ArrayList<>();
+    private int id = 0;
 
     @Override
     public void clear() {
@@ -15,8 +16,10 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     @Override
-    public void createGame(GameData data) {
-        games.add(data);
+    public GameData createGame(String name) {
+        GameData newGame = new GameData(id++, null, null, name, new ChessGame());
+        games.add(newGame);
+        return newGame;
     }
 
     @Override
