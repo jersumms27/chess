@@ -57,7 +57,14 @@ public class GameService {
         }
         //Check if color is taken
         if (request.playerColor() != null) {
-
+            try {
+                gameDAO.verifyColor(Integer.parseInt(request.gameID()), request.playerColor());
+            } catch (DataAccessException ex3) {
+                return new JoinGameResponse("Error: already taken"); //[403]
+            }
+            gameDAO.updateGame(); //TODO put player in game, only change one color
         }
+
+        return new JoinGameResponse(null); //[200]
     }
 }

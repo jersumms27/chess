@@ -5,9 +5,10 @@ import model.GameData;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 
 public class MemoryGameDAO implements GameDAO {
-    private final Collection<GameData> games = new ArrayList<>();
+    private final HashMap<Integer, GameData> games = new HashMap<>();
     private int id = 0;
 
     @Override
@@ -18,27 +19,44 @@ public class MemoryGameDAO implements GameDAO {
     @Override
     public GameData createGame(String name) {
         GameData newGame = new GameData(id++, null, null, name, new ChessGame());
-        games.add(newGame);
+        games.put(newGame.gameID(), newGame);
         return newGame;
     }
 
     @Override
     public GameData getGame(int ID) throws DataAccessException {
-        for (GameData game: games) {
-            if (ID == game.gameID()) {
-                return game;
-            }
+        if (games.containsKey(ID)) {
+            return games.get(ID);
         }
         throw new DataAccessException("Game not found");
     }
 
     @Override
     public Collection<GameData> listGames() {
-        return games;
+        return games.values();
+    }
+
+    // Updates a chess game.
+    // It should replace the chess game string corresponding to a given gameID.
+    // This is used when players join a game or when a move is made.
+    @Override
+    public void updateGame(GameData data) throws DataAccessException {
+        GameData game = getGame(data.gameID());
+
+        games.put(game.gameID(), new GameData(game.gameID(), data.whiteUsername(), data.blackUsername(), data.gameName(), data.game()));
     }
 
     @Override
-    public void updateGame(GameData data) {
+    public void verifyColor(int ID, String color) throws DataAccessException {
+        String username;
+        if (color.equals("WHITE")) {
+            username = games.get(ID).whiteUsername();
+        } else {
+            username = games.get(ID).blackUsername();
+        }
 
+        if (username != null) {
+            throw new DataAccessException("Color not available");
+        }
     }
 }

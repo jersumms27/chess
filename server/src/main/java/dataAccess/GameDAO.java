@@ -9,5 +9,6 @@ public interface GameDAO {
     GameData createGame(String name);
     GameData getGame(int ID) throws DataAccessException;
     Collection<GameData> listGames();
-    void updateGame(GameData data);
+    void updateGame(GameData data) throws DataAccessException;
+    void verifyColor(int ID, String color) throws DataAccessException;
 }

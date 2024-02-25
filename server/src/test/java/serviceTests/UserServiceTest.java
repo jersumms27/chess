@@ -2,6 +2,7 @@ package serviceTests;
 
 import dataAccess.*;
 import model.UserData;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.*;
@@ -10,16 +11,21 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserServiceTest {
 
+    AuthDAO authDAO = new MemoryAuthDAO();
+    UserDAO userDAO = new MemoryUserDAO();
+
     @BeforeEach
     void setUp() {
-        AuthDAO authDAO = new MemoryAuthDAO();
-        UserDAO userDAO = new MemoryUserDAO();
+    }
+
+    @AfterEach
+    void tearDown() {
+        authDAO.clear();
+        userDAO.clear();
     }
 
     @Test
     void login() throws DataAccessException {
-        AuthDAO authDAO = new MemoryAuthDAO();
-        UserDAO userDAO = new MemoryUserDAO();
         LoginRequest request = new LoginRequest("LilTreat", "12345");
         UserService userService = new UserService(authDAO, userDAO);
 
@@ -27,11 +33,7 @@ class UserServiceTest {
 
         userDAO.createUser(new UserData("LilTreat", "12345", "liltreat@gmail.com"));
 
-        try {
-            authDAO.createAuth("LilTreat");
-        } catch (DataAccessException ex) {
-            throw new DataAccessException("sus");
-        }
+        authDAO.createAuth("LilTreat");
         assertEquals(new LoginResponse("LilTreat", authDAO.getAuth("LilTreat"), null), userService.login(request));
     }
 }
