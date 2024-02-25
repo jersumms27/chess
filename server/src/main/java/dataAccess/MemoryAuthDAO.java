@@ -41,10 +41,10 @@ public class MemoryAuthDAO implements AuthDAO {
     }
 
     @Override
-    public void verifyAuth(String authToken) throws DataAccessException {
+    public String getUser(String authToken) throws DataAccessException {
         for (String key: auths.keySet()) {
             if (auths.get(key).authToken().equals(authToken)) {
-                return;
+                return auths.get(key).username();
             }
         }
         throw new DataAccessException("Auth token not found");

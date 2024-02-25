@@ -43,26 +43,35 @@ public class GameService {
     // return:
     public JoinGameResponse joinGame(JoinGameRequest request) {
         GameData gameData;
-        //Verify authToken
-        try {
-            authDAO.verifyAuth(request.authToken());
-        } catch (DataAccessException ex) {
-            return new JoinGameResponse("Error: unauthorized"); //[401]
-        }
         //Check if game exists
         try {
             gameData = gameDAO.getGame(Integer.parseInt(request.gameID()));
-        } catch (DataAccessException ex2) {
+        } catch (DataAccessException ex) {
             return new JoinGameResponse("Error: bad request"); //[400]
         }
         //Check if color is taken
         if (request.playerColor() != null) {
             try {
                 gameDAO.verifyColor(Integer.parseInt(request.gameID()), request.playerColor());
-            } catch (DataAccessException ex3) {
+            } catch (DataAccessException ex2) {
                 return new JoinGameResponse("Error: already taken"); //[403]
             }
-            gameDAO.updateGame(); //TODO put player in game, only change one color
+
+            GameData update;
+            try {
+                if (request.playerColor().equals("WHITE")) {
+                    update = new GameData(Integer.parseInt(request.gameID()), authDAO.getUser(request.authToken()), gameData.blackUsername(), gameData.gameName(), gameData.game());
+                } else {
+                    update = new GameData(Integer.parseInt(request.gameID()), gameData.whiteUsername(), authDAO.getUser(request.authToken()), gameData.gameName(), gameData.game());
+                }
+            } catch (DataAccessException ex3) {
+                return new JoinGameResponse("Error: unauthorized"); //[401]
+            }
+            try {
+                gameDAO.updateGame(update);
+            } catch (DataAccessException ex4) {
+                return new JoinGameResponse("Error: bad request"); //[400]
+            }
         }
 
         return new JoinGameResponse(null); //[200]
