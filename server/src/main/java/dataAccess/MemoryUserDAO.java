@@ -12,15 +12,26 @@ public class MemoryUserDAO implements UserDAO {
     }
 
     @Override
-    public void createUser(UserData data) {
-        users.put(data.username(), data);
+    public void createUser(UserData data) throws DataAccessException {
+        if (!users.containsKey(data.username())) {
+            users.put(data.username(), data);
+        }
+        throw new DataAccessException("User already created");
     }
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
-        if(users.containsKey(username)) {
+        if (users.containsKey(username)) {
             return users.get(username);
         }
         throw new DataAccessException("User not found");
+    }
+
+    @Override
+    public void checkPassword(String username, String password) throws DataAccessException {
+        UserData user = getUser(username);
+        if (!user.password().equals(password) ){
+            throw new DataAccessException("Wrong password");
+        }
     }
 }

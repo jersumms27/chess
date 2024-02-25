@@ -1,4 +1,4 @@
-package dataAccess;
+package service;
 
 public record LogoutRequest(String authToken) {
 }

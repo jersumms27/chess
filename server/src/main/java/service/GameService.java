@@ -1,10 +1,6 @@
 package service;
 
 import dataAccess.*;
-import model.AuthData;
-import model.GameData;
-
-import java.util.Collection;
 
 public class GameService {
     AuthDAO authDAO;
@@ -19,13 +15,13 @@ public class GameService {
     // parameter:
     // return: list of games
     public ListGamesResponse listGames() {
-
+        return null;
     }
 
     // parameter: gameName
     // return: gameID
     public CreateGameResponse createGame(CreateGameRequest request) {
-
+        return null;
     }
 
     public void joinGame(JoinGameRequest request) {

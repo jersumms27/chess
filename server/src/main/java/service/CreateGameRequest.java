@@ -1,4 +1,4 @@
-package dataAccess;
+package service;
 
 public record CreateGameRequest(String gameName) {
 }
