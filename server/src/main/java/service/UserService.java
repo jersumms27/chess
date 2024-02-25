@@ -15,15 +15,15 @@ public class UserService {
 
     // parameter: username, password, email
     // return: username, authToken
-    public AuthData register(UserData user) {
+    public RegisterResponse register(RegisterRequest request) {
         //Check if user already exists
         try {
-            userDAO.getUser(user.username());
+            userDAO.getUser(request.username());
         } catch (DataAccessException ex) {
             //Create new user
-            userDAO.createUser(user);
+            userDAO.createUser(new UserData(request.username(), request.password(), request.email()));
             try {
-                return authDAO.createAuth(user.username());
+                return authDAO.createAuth(request.username());
             } catch (DataAccessException ex2) {
             }
         }
@@ -33,12 +33,17 @@ public class UserService {
     // parameter: username, password
     // return: username, authToken
     public LoginResponse login(LoginRequest request) {
+        //Check if user already exists
+        try {
+            userDAO.getUser(request.username());
+        } catch (DataAccessException ex) {
 
+        }
     }
 
     // parameter: authToken?
     // return:
-    public void logout(UserData user) {
+    public void logout(LogoutRequest request) {
 
     }
 }

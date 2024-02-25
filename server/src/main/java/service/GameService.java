@@ -24,7 +24,7 @@ public class GameService {
 
     // parameter: gameName
     // return: gameID
-    public CreateGameResponse createGame(GameData data) {
+    public CreateGameResponse createGame(CreateGameRequest request) {
 
     }
 

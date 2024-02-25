@@ -14,9 +14,11 @@ public class ClearService {
 
     // parameter:
     // return:
-    public void clear() {
+    public ClearResponse clear() {
         authDAO.clear();
         userDAO.clear();
         gameDAO.clear();
+
+        return new ClearResponse("");
     }
 }
