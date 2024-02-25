@@ -12,6 +12,8 @@ public class ClearService {
         this.gameDAO = gameDAO;
     }
 
+    // parameter:
+    // return:
     public void clear() {
         authDAO.clear();
         userDAO.clear();

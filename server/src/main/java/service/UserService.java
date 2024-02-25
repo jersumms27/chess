@@ -1,8 +1,6 @@
 package service;
 
-import dataAccess.AuthDAO;
-import dataAccess.DataAccessException;
-import dataAccess.UserDAO;
+import dataAccess.*;
 import model.AuthData;
 import model.UserData;
 
@@ -14,6 +12,9 @@ public class UserService {
         this.authDAO = authDAO;
         this.userDAO = userDAO;
     }
+
+    // parameter: username, password, email
+    // return: username, authToken
     public AuthData register(UserData user) {
         //Check if user already exists
         try {
@@ -21,16 +22,22 @@ public class UserService {
         } catch (DataAccessException ex) {
             //Create new user
             userDAO.createUser(user);
-            return authDAO.createAuth(user.username());
+            try {
+                return authDAO.createAuth(user.username());
+            } catch (DataAccessException ex2) {
+            }
         }
-
         return null;
     }
 
-    public AuthData login(UserData user) {
+    // parameter: username, password
+    // return: username, authToken
+    public LoginResponse login(LoginRequest request) {
 
     }
 
+    // parameter: authToken?
+    // return:
     public void logout(UserData user) {
 
     }
