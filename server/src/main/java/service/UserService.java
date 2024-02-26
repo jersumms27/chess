@@ -71,7 +71,7 @@ public class UserService {
 
     // parameter: authToken?
     // return:
-    public void logout(LogoutRequest request) {
-
+    public LoginResponse logout(LogoutRequest request) {
+        return null;
     }
 }
