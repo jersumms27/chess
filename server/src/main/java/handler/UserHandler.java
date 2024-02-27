@@ -7,7 +7,7 @@ public class UserHandler implements Handler {
 
     // parameter: username, password, email
     // return: username, authToken
-    String register(String requestString) {
+    public String register(String requestString) {
         RegisterRequest requestObject = serializer.fromJson(requestString, RegisterRequest.class);
         RegisterResponse responseObject = userService.register(requestObject);
         return serializer.toJson(responseObject);
@@ -15,7 +15,7 @@ public class UserHandler implements Handler {
 
     // parameter: username, password
     // return: username, authToken
-    String login(String requestString) {
+    public String login(String requestString) {
         LoginRequest requestObject = serializer.fromJson(requestString, LoginRequest.class);
         LoginResponse responseObject = userService.login(requestObject);
         return serializer.toJson(responseObject);
@@ -23,7 +23,7 @@ public class UserHandler implements Handler {
 
     // parameter: authToken
     // return:
-    String logout(String requestString) {
+    public String logout(String requestString) {
         return null;
     }
 }
