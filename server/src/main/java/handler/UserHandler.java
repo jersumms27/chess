@@ -1,7 +1,10 @@
 package handler;
 
-import com.google.gson.*;
-import service.*;
+import service.request.LoginRequest;
+import service.request.RegisterRequest;
+import service.response.LoginResponse;
+import service.response.LogoutResponse;
+import service.response.RegisterResponse;
 
 public class UserHandler implements Handler {
 

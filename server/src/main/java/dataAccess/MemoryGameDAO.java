@@ -24,9 +24,9 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     @Override
-    public GameData getGame(int ID) throws DataAccessException {
-        if (games.containsKey(ID)) {
-            return games.get(ID);
+    public GameData getGame(int id) throws DataAccessException {
+        if (games.containsKey(id)) {
+            return games.get(id);
         }
         throw new DataAccessException("Game not found");
     }
@@ -47,12 +47,12 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     @Override
-    public void verifyColor(int ID, String color) throws DataAccessException {
+    public void verifyColor(int id, String color) throws DataAccessException {
         String username;
         if (color.equals("WHITE")) {
-            username = games.get(ID).whiteUsername();
+            username = games.get(id).whiteUsername();
         } else {
-            username = games.get(ID).blackUsername();
+            username = games.get(id).blackUsername();
         }
 
         if (username != null) {

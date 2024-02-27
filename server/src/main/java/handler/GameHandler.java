@@ -1,7 +1,10 @@
 package handler;
 
-import com.google.gson.JsonObject;
-import service.*;
+import service.request.CreateGameRequest;
+import service.request.JoinGameRequest;
+import service.response.CreateGameResponse;
+import service.response.JoinGameResponse;
+import service.response.ListGamesResponse;
 
 public class GameHandler implements Handler {
     // parameter: authToken

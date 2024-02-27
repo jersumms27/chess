@@ -1,6 +1,7 @@
 package service;
 
 import dataAccess.*;
+import service.response.ClearResponse;
 
 public class ClearService {
     AuthDAO authDAO;

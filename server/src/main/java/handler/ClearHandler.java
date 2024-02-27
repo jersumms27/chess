@@ -1,7 +1,6 @@
 package handler;
 
-import com.google.gson.JsonObject;
-import service.*;
+import service.response.ClearResponse;
 
 public class ClearHandler implements Handler {
     public String clear() {
