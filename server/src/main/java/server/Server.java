@@ -1,7 +1,9 @@
 package server;
 
+import service.*;
 import spark.*;
 import handler.*;
+import com.google.gson.*;
 
 public class Server {
     ClearHandler clearHandler = new ClearHandler();
@@ -28,35 +30,98 @@ public class Server {
     }
 
     private Object clear(Request request, Response response) {
-        response.status(204);
+        response.status(200);
         return clearHandler.clear();
     }
 
     private Object register(Request request, Response response) {
         String registerResponse = userHandler.register(request.body());
-        return null;
+        String message = (new Gson()).fromJson(registerResponse, RegisterResponse.class).message();
+        if (message == null) {
+            response.status(200);
+            return JsonParser.parseString(registerResponse).getAsJsonObject().remove("message").toString();
+        } else {
+            response.status(getErrorCode(message));
+            return createJsonMessage(message);
+        }
     }
 
     private Object login(Request request, Response response) {
-        return null;
+        String loginResponse = userHandler.register(request.body());
+        String message = (new Gson()).fromJson(loginResponse, RegisterResponse.class).message();
+        if (message == null) {
+            response.status(200);
+            return JsonParser.parseString(loginResponse).getAsJsonObject().remove("message").toString();
+        } else {
+            response.status(getErrorCode(message));
+            return createJsonMessage(message);
+        }
     }
 
     private Object logout(Request request, Response response) {
-        return null;
+        String logoutResponse = userHandler.register(request.body());
+        String message = (new Gson()).fromJson(logoutResponse, RegisterResponse.class).message();
+        if (message == null) {
+            response.status(200);
+            return JsonParser.parseString(logoutResponse).getAsJsonObject().remove("message").toString();
+        } else {
+            response.status(getErrorCode(message));
+            return createJsonMessage(message);
+        }
     }
 
     private Object listGames(Request request, Response response) {
-        return null;
+        String listGamesResponse = userHandler.register(request.body());
+        String message = (new Gson()).fromJson(listGamesResponse, RegisterResponse.class).message();
+        if (message == null) {
+            response.status(200);
+            return JsonParser.parseString(listGamesResponse).getAsJsonObject().remove("message").toString();
+        } else {
+            response.status(getErrorCode(message));
+            return createJsonMessage(message);
+        }
     }
 
     private Object createGame(Request request, Response response) {
-        return null;
+        String createGameResponse = userHandler.register(request.body());
+        String message = (new Gson()).fromJson(createGameResponse, RegisterResponse.class).message();
+        if (message == null) {
+            response.status(200);
+            return JsonParser.parseString(createGameResponse).getAsJsonObject().remove("message").toString();
+        } else {
+            response.status(getErrorCode(message));
+            return createJsonMessage(message);
+        }
     }
 
     private Object joinGame(Request request, Response response) {
-        return null;
+        String joinGameResponse = userHandler.register(request.body());
+        String message = (new Gson()).fromJson(joinGameResponse, RegisterResponse.class).message();
+        if (message == null) {
+            response.status(200);
+            return JsonParser.parseString(joinGameResponse).getAsJsonObject().remove("message").toString();
+        } else {
+            response.status(getErrorCode(message));
+            return createJsonMessage(message);
+        }
     }
 
+    private String createJsonMessage(String message) {
+        return "{ \"message\": \"" + message + "\" }";
+    }
+
+    private int getErrorCode(String message) {
+        if (message.equals("Error: bad request")) {
+            return 400;
+        } else if (message.equals("Error: already taken")) {
+            return 403;
+        } else if (message.equals("Error: unauthorized")) {
+            return 401;
+        } else if (message.equals("Error: description")) {
+            return 500;
+        }
+        return 0;
+    }
 
     public void stop() {
         Spark.stop();

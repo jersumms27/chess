@@ -18,7 +18,7 @@ public class GameService {
     public ListGamesResponse listGames(ListGamesRequest request) {
         //Verify authToken
         try {
-            authDAO.verifyAuth(request.authToken());
+            authDAO.getAuth(request.authToken());
         } catch (DataAccessException ex) {
             return new ListGamesResponse(null, "Error: unauthorized");
         }
@@ -31,7 +31,7 @@ public class GameService {
     public CreateGameResponse createGame(CreateGameRequest request) {
         //Verify authToken
         try {
-            authDAO.verifyAuth(request.authToken());
+            authDAO.getAuth(request.authToken());
         } catch (DataAccessException ex) {
             return new CreateGameResponse(null, "Error: unauthorized"); //[401]
         }
