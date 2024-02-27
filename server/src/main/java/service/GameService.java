@@ -15,10 +15,10 @@ public class GameService {
 
     // parameter: authToken
     // return: list of games
-    public ListGamesResponse listGames(ListGamesRequest request) {
+    public ListGamesResponse listGames(String authToken) {
         //Verify authToken
         try {
-            authDAO.getAuth(request.authToken());
+            authDAO.getAuth(authToken);
         } catch (DataAccessException ex) {
             return new ListGamesResponse(null, "Error: unauthorized");
         }
@@ -28,10 +28,10 @@ public class GameService {
 
     // parameter: gameName
     // return: gameID
-    public CreateGameResponse createGame(CreateGameRequest request) {
+    public CreateGameResponse createGame(String authToken, CreateGameRequest request) {
         //Verify authToken
         try {
-            authDAO.getAuth(request.authToken());
+            authDAO.getAuth(authToken);
         } catch (DataAccessException ex) {
             return new CreateGameResponse(null, "Error: unauthorized"); //[401]
         }
@@ -41,7 +41,7 @@ public class GameService {
 
     // parameter: authToken, playerColor, gameID
     // return:
-    public JoinGameResponse joinGame(JoinGameRequest request) {
+    public JoinGameResponse joinGame(String authToken, JoinGameRequest request) {
         GameData gameData;
         //Check if game exists
         try {
@@ -60,9 +60,9 @@ public class GameService {
             GameData update;
             try {
                 if (request.playerColor().equals("WHITE")) {
-                    update = new GameData(Integer.parseInt(request.gameID()), authDAO.getUser(request.authToken()), gameData.blackUsername(), gameData.gameName(), gameData.game());
+                    update = new GameData(Integer.parseInt(request.gameID()), authDAO.getUser(authToken), gameData.blackUsername(), gameData.gameName(), gameData.game());
                 } else {
-                    update = new GameData(Integer.parseInt(request.gameID()), gameData.whiteUsername(), authDAO.getUser(request.authToken()), gameData.gameName(), gameData.game());
+                    update = new GameData(Integer.parseInt(request.gameID()), gameData.whiteUsername(), authDAO.getUser(authToken), gameData.gameName(), gameData.game());
                 }
             } catch (DataAccessException ex3) {
                 return new JoinGameResponse("Error: unauthorized"); //[401]

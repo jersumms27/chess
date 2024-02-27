@@ -16,7 +16,7 @@ public class UserService {
     // parameter: username, password, email
     // return: username, authToken
     public RegisterResponse register(RegisterRequest request) {
-        AuthData authData;
+        String authToken;
         //Check if user already exists
         try {
             userDAO.getUser(request.username());
@@ -28,12 +28,12 @@ public class UserService {
                 return new RegisterResponse(null, null, "Error: already taken"); //[403]
             }
             try {
-                authData = authDAO.createAuth(request.username());
+                authToken = authDAO.createAuth(request.username());
             } catch (DataAccessException ex3) {
                 return new RegisterResponse(null, null, "Error: bad request"); //[400]
             }
 
-            return new RegisterResponse(request.username(), authData.authToken(), ""); //[200]
+            return new RegisterResponse(request.username(), authToken, ""); //[200]
         }
         return new RegisterResponse(null, null, "Error: already taken"); //[403]
     }
@@ -42,31 +42,13 @@ public class UserService {
     // return: username, authToken
     public LoginResponse login(LoginRequest request) {
         LoginResponse error = new LoginResponse(null, null, "Error: unauthorized"); //[401]
-        //Check if user already exists
         try {
-            userDAO.getUser(request.username());
+            userDAO.checkPassword(request.username(), request.password());
+            String authToken = authDAO.createAuth(request.username());
+            return new LoginResponse(request.username(), authToken, ""); //[200]
         } catch (DataAccessException ex) {
             return error;
         }
-        //Check if password is correct
-        try {
-            userDAO.checkPassword(request.username(), request.password());
-        } catch (DataAccessException ex2) {
-            return error;
-        }
-        //Create authToken
-        AuthData authData;
-        try {
-            authData = authDAO.createAuth(request.username());
-        } catch (DataAccessException ex3) {
-            try {
-                return new LoginResponse(request.username(), authDAO.getAuth(request.username()), "");
-            } catch (DataAccessException ex4) {
-                return error;
-            }
-        }
-        return new LoginResponse(request.username(), authData.authToken(), ""); //[200]
-
     }
 
     // parameter: authToken?

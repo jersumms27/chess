@@ -31,7 +31,7 @@ public class MemoryUserDAO implements UserDAO {
     @Override
     public void checkPassword(String username, String password) throws DataAccessException {
         UserData user = getUser(username);
-        if (!user.password().equals(password) ){
+        if (!user.password().equals(password)) {
             throw new DataAccessException("Wrong password");
         }
     }

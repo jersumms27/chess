@@ -13,14 +13,11 @@ public class MemoryAuthDAO implements AuthDAO {
     }
 
     @Override
-    public AuthData createAuth(String username) throws DataAccessException {
-        if(auths.containsKey(username)) {
-            throw new DataAccessException("Auth token already created");
-        }
+    public String createAuth(String username) {
         String token = UUID.randomUUID().toString();
         AuthData newData = new AuthData(token, username);
         auths.put(username, newData);
-        return newData;
+        return token;
     }
 
     @Override

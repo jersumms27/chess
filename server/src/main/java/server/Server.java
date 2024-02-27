@@ -84,7 +84,7 @@ public class Server {
     }
 
     private Object createGame(Request request, Response response) {
-        String createGameResponse = gameHandler.createGame(request.body());
+        String createGameResponse = gameHandler.createGame(request.headers("authorization"), request.body());
         String message = (new Gson()).fromJson(createGameResponse, RegisterResponse.class).message();
         if (message.isEmpty()) {
             response.status(200);
@@ -96,7 +96,7 @@ public class Server {
     }
 
     private Object joinGame(Request request, Response response) {
-        String joinGameResponse = gameHandler.joinGame(request.body());
+        String joinGameResponse = gameHandler.joinGame(request.headers("authorization"), request.body());
         String message = (new Gson()).fromJson(joinGameResponse, RegisterResponse.class).message();
         if (message.isEmpty()) {
             response.status(200);
