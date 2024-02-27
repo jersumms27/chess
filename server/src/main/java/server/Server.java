@@ -43,66 +43,72 @@ public class Server {
             return JsonParser.parseString(registerResponse).getAsJsonObject();
         } else {
             response.status(getErrorCode(message));
+            System.out.println("register");
             return createJsonMessage(message);
         }
     }
 
     private Object login(Request request, Response response) {
         String loginResponse = userHandler.login(request.body());
-        String message = (new Gson()).fromJson(loginResponse, RegisterResponse.class).message();
+        String message = (new Gson()).fromJson(loginResponse, LoginResponse.class).message();
         if (message.isEmpty()) {
             response.status(200);
             return JsonParser.parseString(loginResponse).getAsJsonObject().toString();
         } else {
             response.status(getErrorCode(message));
+            System.out.println("login");
             return createJsonMessage(message);
         }
     }
 
     private Object logout(Request request, Response response) {
         String logoutResponse = userHandler.logout(request.headers("authorization"));
-        String message = (new Gson()).fromJson(logoutResponse, RegisterResponse.class).message();
+        String message = (new Gson()).fromJson(logoutResponse, LogoutResponse.class).message();
         if (message.isEmpty()) {
             response.status(200);
             return JsonParser.parseString(logoutResponse).getAsJsonObject().toString();
         } else {
             response.status(getErrorCode(message));
+            System.out.println("logout");
             return createJsonMessage(message);
         }
     }
 
     private Object listGames(Request request, Response response) {
         String listGamesResponse = gameHandler.listGames(request.headers("authorization"));
-        String message = (new Gson()).fromJson(listGamesResponse, RegisterResponse.class).message();
+        String message = (new Gson()).fromJson(listGamesResponse, ListGamesResponse.class).message();
         if (message.isEmpty()) {
             response.status(200);
             return JsonParser.parseString(listGamesResponse).getAsJsonObject().toString();
         } else {
             response.status(getErrorCode(message));
+            System.out.println("listGames");
             return createJsonMessage(message);
         }
     }
 
     private Object createGame(Request request, Response response) {
         String createGameResponse = gameHandler.createGame(request.headers("authorization"), request.body());
-        String message = (new Gson()).fromJson(createGameResponse, RegisterResponse.class).message();
+        String message = (new Gson()).fromJson(createGameResponse, CreateGameResponse.class).message();
         if (message.isEmpty()) {
             response.status(200);
             return JsonParser.parseString(createGameResponse).getAsJsonObject().toString();
         } else {
             response.status(getErrorCode(message));
+            System.out.println("createGame");
             return createJsonMessage(message);
         }
     }
 
     private Object joinGame(Request request, Response response) {
         String joinGameResponse = gameHandler.joinGame(request.headers("authorization"), request.body());
-        String message = (new Gson()).fromJson(joinGameResponse, RegisterResponse.class).message();
+        String message = (new Gson()).fromJson(joinGameResponse, JoinGameResponse.class).message();
         if (message.isEmpty()) {
             response.status(200);
             return JsonParser.parseString(joinGameResponse).getAsJsonObject().toString();
         } else {
             response.status(getErrorCode(message));
+            System.out.println("joinGame");
             return createJsonMessage(message);
         }
     }

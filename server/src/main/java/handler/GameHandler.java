@@ -14,6 +14,8 @@ public class GameHandler implements Handler {
     // parameter: authToken, gameName
     // return: gameID
     public String createGame(String authToken, String requestString) {
+        System.out.println(authToken);
+        System.out.println(requestString);
         CreateGameRequest requestObject = serializer.fromJson(requestString, CreateGameRequest.class);
         CreateGameResponse responseObject = gameService.createGame(authToken, requestObject);
         return serializer.toJson(responseObject);

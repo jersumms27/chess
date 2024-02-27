@@ -1,6 +1,8 @@
 package dataAccess;
 
 import model.AuthData;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -16,16 +18,18 @@ public class MemoryAuthDAO implements AuthDAO {
     public String createAuth(String username) {
         String token = UUID.randomUUID().toString();
         AuthData newData = new AuthData(token, username);
-        auths.put(username, newData);
+        auths.put(token, newData);
         return token;
     }
 
     @Override
-    public String getAuth(String username) throws DataAccessException {
-        if (!auths.containsKey(username)) {
-            throw new DataAccessException("Auth token not yet created");
+    public AuthData getAuth(String authToken) throws DataAccessException {
+        for (AuthData data: auths.values()) {
+            if (data.authToken().equals(authToken)) {
+                return data;
+            }
         }
-        return auths.get(username).authToken();
+        throw new DataAccessException("Auth token not found");
     }
 
     @Override
@@ -35,11 +39,9 @@ public class MemoryAuthDAO implements AuthDAO {
 
     @Override
     public String getUser(String authToken) throws DataAccessException {
-        for (String key: auths.keySet()) {
-            if (auths.get(key).authToken().equals(authToken)) {
-                return auths.get(key).username();
-            }
+        if (!auths.containsKey(authToken)) {
+            throw new DataAccessException("Auth token not found");
         }
-        throw new DataAccessException("Auth token not found");
+        return auths.get(authToken).username();
     }
 }
