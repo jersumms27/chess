@@ -17,25 +17,17 @@ public class UserService {
     // return: username, authToken
     public RegisterResponse register(RegisterRequest request) {
         String authToken;
-        //Check if user already exists
-        try {
-            userDAO.getUser(request.username());
-        } catch (DataAccessException ex) {
-            //Create new user
-            try {
-                userDAO.createUser(new UserData(request.username(), request.password(), request.email()));
-            } catch (DataAccessException ex2) {
-                return new RegisterResponse(null, null, "Error: already taken"); //[403]
-            }
-            try {
-                authToken = authDAO.createAuth(request.username());
-            } catch (DataAccessException ex3) {
-                return new RegisterResponse(null, null, "Error: bad request"); //[400]
-            }
-
-            return new RegisterResponse(request.username(), authToken, ""); //[200]
+        //Create new user
+        if (request.password() == null) {
+            return new RegisterResponse(null, null, "Error: bad request"); //[400]
         }
-        return new RegisterResponse(null, null, "Error: already taken"); //[403]
+        try {
+            userDAO.createUser(new UserData(request.username(), request.password(), request.email()));
+        } catch (DataAccessException ex2) {
+            return new RegisterResponse(null, null, "Error: already taken"); //[403]
+        }
+        authToken = authDAO.createAuth(request.username());
+        return new RegisterResponse(request.username(), authToken, ""); //[200]
     }
 
     // parameter: username, password
@@ -57,7 +49,7 @@ public class UserService {
         try {
             authDAO.deleteAuth(authToken);
         } catch (DataAccessException ex) {
-            new LogoutResponse("Error: unauthorized"); //[401]
+            return new LogoutResponse("Error: unauthorized"); //[401]
         }
         return new LogoutResponse(""); //[200]
     }

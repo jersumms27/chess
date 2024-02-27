@@ -30,11 +30,11 @@ public class GameService {
     // return: gameID
     public CreateGameResponse createGame(String authToken, CreateGameRequest request) {
         //Verify authToken
-        //try {
-        //    authDAO.getAuth(authToken);
-        //} catch (DataAccessException ex) {
-        //    return new CreateGameResponse(null, "Error: unauthorized"); //[401]
-        //}
+        try {
+            authDAO.getAuth(authToken);
+        } catch (DataAccessException ex) {
+            return new CreateGameResponse(null, "Error: unauthorized"); //[401]
+        }
 
         return new CreateGameResponse(String.valueOf((gameDAO.createGame(request.gameName()).gameID())), "");
     }
@@ -71,6 +71,12 @@ public class GameService {
                 gameDAO.updateGame(update);
             } catch (DataAccessException ex4) {
                 return new JoinGameResponse("Error: bad request"); //[400]
+            }
+        } else {
+            try {
+                authDAO.getAuth(authToken);
+            } catch (DataAccessException ex5) {
+                return new JoinGameResponse("Error: unauthorized"); //[401]
             }
         }
 

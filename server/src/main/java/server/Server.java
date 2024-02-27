@@ -43,7 +43,6 @@ public class Server {
             return JsonParser.parseString(registerResponse).getAsJsonObject();
         } else {
             response.status(getErrorCode(message));
-            System.out.println("register");
             return createJsonMessage(message);
         }
     }
@@ -56,7 +55,6 @@ public class Server {
             return JsonParser.parseString(loginResponse).getAsJsonObject().toString();
         } else {
             response.status(getErrorCode(message));
-            System.out.println("login");
             return createJsonMessage(message);
         }
     }
@@ -69,7 +67,6 @@ public class Server {
             return JsonParser.parseString(logoutResponse).getAsJsonObject().toString();
         } else {
             response.status(getErrorCode(message));
-            System.out.println("logout");
             return createJsonMessage(message);
         }
     }
@@ -82,7 +79,6 @@ public class Server {
             return JsonParser.parseString(listGamesResponse).getAsJsonObject().toString();
         } else {
             response.status(getErrorCode(message));
-            System.out.println("listGames");
             return createJsonMessage(message);
         }
     }
@@ -95,7 +91,6 @@ public class Server {
             return JsonParser.parseString(createGameResponse).getAsJsonObject().toString();
         } else {
             response.status(getErrorCode(message));
-            System.out.println("createGame");
             return createJsonMessage(message);
         }
     }
@@ -108,7 +103,6 @@ public class Server {
             return JsonParser.parseString(joinGameResponse).getAsJsonObject().toString();
         } else {
             response.status(getErrorCode(message));
-            System.out.println("joinGame");
             return createJsonMessage(message);
         }
     }
