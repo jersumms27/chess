@@ -23,9 +23,8 @@ public class UserHandler implements Handler {
 
     // parameter: authToken
     // return:
-    public String logout(String requestString) {
-        LogoutRequest requestObject = serializer.fromJson(requestString, LogoutRequest.class);
-        LogoutResponse responseObject = userService.logout(requestObject);
+    public String logout(String authToken) {
+        LogoutResponse responseObject = userService.logout(authToken);
         return serializer.toJson(responseObject);
     }
 }

@@ -112,16 +112,13 @@ public class Server {
     }
 
     private int getErrorCode(String message) {
-        if (message.equals("Error: bad request")) {
-            return 400;
-        } else if (message.equals("Error: already taken")) {
-            return 403;
-        } else if (message.equals("Error: unauthorized")) {
-            return 401;
-        } else if (message.equals("Error: description")) {
-            return 500;
-        }
-        return 0;
+        return switch (message) {
+            case "Error: bad request" -> 400;
+            case "Error: already taken" -> 403;
+            case "Error: unauthorized" -> 401;
+            case "Error: description" -> 500;
+            default -> 0;
+        };
     }
 
     public void stop() {

@@ -71,9 +71,9 @@ public class UserService {
 
     // parameter: authToken?
     // return:
-    public LogoutResponse logout(LogoutRequest request) {
+    public LogoutResponse logout(String authToken) {
         try {
-            authDAO.deleteAuth(request.authToken());
+            authDAO.deleteAuth(authToken);
         } catch (DataAccessException ex) {
             new LogoutResponse("Error: unauthorized"); //[401]
         }
