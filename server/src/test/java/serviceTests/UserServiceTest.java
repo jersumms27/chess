@@ -6,8 +6,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.*;
-import service.request.LoginRequest;
-import service.response.LoginResponse;
+import service.request.*;
+import service.response.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,6 +15,7 @@ class UserServiceTest {
 
     AuthDAO authDAO = new MemoryAuthDAO();
     UserDAO userDAO = new MemoryUserDAO();
+    UserService userService = new UserService(authDAO, userDAO);
 
     @BeforeEach
     void setUp() {
@@ -27,15 +28,55 @@ class UserServiceTest {
     }
 
     @Test
-    void login() throws DataAccessException {
-        LoginRequest request = new LoginRequest("LilTreat", "12345");
-        UserService userService = new UserService(authDAO, userDAO);
+    void loginSuccess() {
+        RegisterRequest register = new RegisterRequest("username", "password", "email");
+        userService.register(register);
+        LoginRequest valid = new LoginRequest("username", "password");
+        LoginResponse actual = userService.login(valid);
+        LoginResponse expected = new LoginResponse("username", actual.authToken(), "");
+        assertEquals(expected, actual);
+    }
 
-        assertEquals(new LoginResponse(null, null, "Error: unauthorized"), userService.login(request));
+    @Test
+    void loginFail() {
+        LoginRequest invalid = new LoginRequest("username", "password");
+        LoginResponse actual = userService.login(invalid);
+        LoginResponse expected = new LoginResponse(null, null, "Error: unauthorized");
+        assertEquals(expected, actual);
+    }
 
-        userDAO.createUser(new UserData("LilTreat", "12345", "liltreat@gmail.com"));
+    @Test
+    void logoutSuccess() {
+        RegisterRequest register = new RegisterRequest("username", "password", "email");
+        userService.register(register);
+        LoginRequest login = new LoginRequest("username", "password");
+        LoginResponse response = userService.login(login);
+        LogoutResponse actual = userService.logout(response.authToken());
+        LogoutResponse expected = new LogoutResponse("");
+        assertEquals(expected, actual);
+    }
 
-        authDAO.createAuth("LilTreat");
-        //assertEquals(new LoginResponse("LilTreat", authDAO.getAuth("LilTreat"), null), userService.login(request));
+    @Test
+    void logoutFail() {
+        LogoutResponse expected = new LogoutResponse("Error: unauthorized");
+        LogoutResponse actual = userService.logout("fake");
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void registerSuccess() {
+        RegisterRequest request = new RegisterRequest("username", "password", "email");
+        RegisterResponse actual = userService.register(request);
+        RegisterResponse expected = new RegisterResponse("username", actual.authToken(), "");
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void registerFail() {
+        RegisterRequest request = new RegisterRequest("username", "password", "");
+        userService.register(request);
+        RegisterResponse actual = userService.register(request);
+        RegisterResponse expected = new RegisterResponse(null, null, "Error: already taken");
+        assertEquals(expected, actual);
     }
 }
