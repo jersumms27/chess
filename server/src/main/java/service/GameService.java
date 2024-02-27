@@ -23,7 +23,7 @@ public class GameService {
             return new ListGamesResponse(null, "Error: unauthorized");
         }
 
-        return new ListGamesResponse(gameDAO.listGames(), null);
+        return new ListGamesResponse(gameDAO.listGames(), "");
     }
 
     // parameter: gameName
@@ -36,7 +36,7 @@ public class GameService {
             return new CreateGameResponse(null, "Error: unauthorized"); //[401]
         }
 
-        return new CreateGameResponse(String.valueOf((gameDAO.createGame(request.gameName()).gameID())), null);
+        return new CreateGameResponse(String.valueOf((gameDAO.createGame(request.gameName()).gameID())), "");
     }
 
     // parameter: authToken, playerColor, gameID
@@ -74,6 +74,6 @@ public class GameService {
             }
         }
 
-        return new JoinGameResponse(null); //[200]
+        return new JoinGameResponse(""); //[200]
     }
 }

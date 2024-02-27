@@ -20,7 +20,6 @@ public class MemoryAuthDAO implements AuthDAO {
         String token = UUID.randomUUID().toString();
         AuthData newData = new AuthData(token, username);
         auths.put(username, newData);
-        System.out.println(newData);
         return newData;
     }
 
@@ -33,11 +32,8 @@ public class MemoryAuthDAO implements AuthDAO {
     }
 
     @Override
-    public void deleteAuth(AuthData data) throws DataAccessException {
-        if (!auths.containsValue(data)) {
-            throw new DataAccessException("Auth token not found");
-        }
-        auths.remove(data.username());
+    public void deleteAuth(String authToken) throws DataAccessException {
+        auths.remove(getUser(authToken));
     }
 
     @Override

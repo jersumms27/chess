@@ -33,7 +33,7 @@ public class UserService {
                 return new RegisterResponse(null, null, "Error: bad request"); //[400]
             }
 
-            return new RegisterResponse(request.username(), authData.authToken(), null); //[200]
+            return new RegisterResponse(request.username(), authData.authToken(), ""); //[200]
         }
         return new RegisterResponse(null, null, "Error: already taken"); //[403]
     }
@@ -60,18 +60,23 @@ public class UserService {
             authData = authDAO.createAuth(request.username());
         } catch (DataAccessException ex3) {
             try {
-                return new LoginResponse(request.username(), authDAO.getAuth(request.username()), null);
+                return new LoginResponse(request.username(), authDAO.getAuth(request.username()), "");
             } catch (DataAccessException ex4) {
                 return error;
             }
         }
-        return new LoginResponse(request.username(), authData.authToken(), null); //[200]
+        return new LoginResponse(request.username(), authData.authToken(), ""); //[200]
 
     }
 
     // parameter: authToken?
     // return:
-    public LoginResponse logout(LogoutRequest request) {
-        return null;
+    public LogoutResponse logout(LogoutRequest request) {
+        try {
+            authDAO.deleteAuth(request.authToken());
+        } catch (DataAccessException ex) {
+            new LogoutResponse("Error: unauthorized"); //[401]
+        }
+        return new LogoutResponse(""); //[200]
     }
 }

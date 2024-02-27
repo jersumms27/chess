@@ -31,15 +31,16 @@ public class Server {
 
     private Object clear(Request request, Response response) {
         response.status(200);
-        return clearHandler.clear();
+        clearHandler.clear();
+        return "{}";
     }
 
     private Object register(Request request, Response response) {
         String registerResponse = userHandler.register(request.body());
         String message = (new Gson()).fromJson(registerResponse, RegisterResponse.class).message();
-        if (message == null) {
+        if (message.isEmpty()) {
             response.status(200);
-            return JsonParser.parseString(registerResponse).getAsJsonObject().remove("message").toString();
+            return JsonParser.parseString(registerResponse).getAsJsonObject();
         } else {
             response.status(getErrorCode(message));
             return createJsonMessage(message);
@@ -47,11 +48,11 @@ public class Server {
     }
 
     private Object login(Request request, Response response) {
-        String loginResponse = userHandler.register(request.body());
+        String loginResponse = userHandler.login(request.body());
         String message = (new Gson()).fromJson(loginResponse, RegisterResponse.class).message();
-        if (message == null) {
+        if (message.isEmpty()) {
             response.status(200);
-            return JsonParser.parseString(loginResponse).getAsJsonObject().remove("message").toString();
+            return JsonParser.parseString(loginResponse).getAsJsonObject().toString();
         } else {
             response.status(getErrorCode(message));
             return createJsonMessage(message);
@@ -59,11 +60,11 @@ public class Server {
     }
 
     private Object logout(Request request, Response response) {
-        String logoutResponse = userHandler.register(request.body());
+        String logoutResponse = userHandler.logout(request.headers("authorization"));
         String message = (new Gson()).fromJson(logoutResponse, RegisterResponse.class).message();
-        if (message == null) {
+        if (message.isEmpty()) {
             response.status(200);
-            return JsonParser.parseString(logoutResponse).getAsJsonObject().remove("message").toString();
+            return JsonParser.parseString(logoutResponse).getAsJsonObject().toString();
         } else {
             response.status(getErrorCode(message));
             return createJsonMessage(message);
@@ -71,11 +72,11 @@ public class Server {
     }
 
     private Object listGames(Request request, Response response) {
-        String listGamesResponse = userHandler.register(request.body());
+        String listGamesResponse = gameHandler.listGames(request.headers("authorization"));
         String message = (new Gson()).fromJson(listGamesResponse, RegisterResponse.class).message();
-        if (message == null) {
+        if (message.isEmpty()) {
             response.status(200);
-            return JsonParser.parseString(listGamesResponse).getAsJsonObject().remove("message").toString();
+            return JsonParser.parseString(listGamesResponse).getAsJsonObject().toString();
         } else {
             response.status(getErrorCode(message));
             return createJsonMessage(message);
@@ -83,11 +84,11 @@ public class Server {
     }
 
     private Object createGame(Request request, Response response) {
-        String createGameResponse = userHandler.register(request.body());
+        String createGameResponse = gameHandler.createGame(request.body());
         String message = (new Gson()).fromJson(createGameResponse, RegisterResponse.class).message();
-        if (message == null) {
+        if (message.isEmpty()) {
             response.status(200);
-            return JsonParser.parseString(createGameResponse).getAsJsonObject().remove("message").toString();
+            return JsonParser.parseString(createGameResponse).getAsJsonObject().toString();
         } else {
             response.status(getErrorCode(message));
             return createJsonMessage(message);
@@ -95,11 +96,11 @@ public class Server {
     }
 
     private Object joinGame(Request request, Response response) {
-        String joinGameResponse = userHandler.register(request.body());
+        String joinGameResponse = gameHandler.joinGame(request.body());
         String message = (new Gson()).fromJson(joinGameResponse, RegisterResponse.class).message();
-        if (message == null) {
+        if (message.isEmpty()) {
             response.status(200);
-            return JsonParser.parseString(joinGameResponse).getAsJsonObject().remove("message").toString();
+            return JsonParser.parseString(joinGameResponse).getAsJsonObject().toString();
         } else {
             response.status(getErrorCode(message));
             return createJsonMessage(message);
