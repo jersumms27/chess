@@ -5,9 +5,9 @@ import dataAccess.*;
 import service.*;
 
 public interface Handler {
-    AuthDAO authDAO = new MemoryAuthDAO();
-    UserDAO userDAO = new MemoryUserDAO();
-    GameDAO gameDAO = new MemoryGameDAO();
+    AuthDAO authDAO = new SQLAuthDAO();
+    UserDAO userDAO = new SQLUserDAO();
+    GameDAO gameDAO = new SQLGameDAO();
 
     ClearService clearService = new ClearService(authDAO, userDAO, gameDAO);
     UserService userService = new UserService(authDAO, userDAO);
