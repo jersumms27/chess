@@ -3,6 +3,9 @@ package dataAccess;
 import java.sql.*;
 import java.util.Properties;
 
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
+import static java.sql.Types.NULL;
+
 public class DatabaseManager {
     private static final String databaseName;
     private static final String user;
@@ -36,13 +39,71 @@ public class DatabaseManager {
      */
     static void createDatabase() throws DataAccessException {
         try {
-            var statement = "CREATE DATABASE IF NOT EXISTS " + databaseName;
+            var statement = "CREATE SCHEMA IF NOT EXISTS " + databaseName;
             var conn = DriverManager.getConnection(connectionUrl, user, password);
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
+        }
+    }
+
+    static void createAuthTable() throws DataAccessException {
+        try {
+            String statement = """
+                CREATE TABLE IF NOT EXISTS `chess`.`auth` (
+                    `token` VARCHAR(255) NOT NULL,
+                    `username` VARCHAR(255) NOT NULL,
+                    PRIMARY KEY ('token')
+                );
+                """;
+            var conn = DriverManager.getConnection(connectionUrl, user, password);
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
+    }
+
+    static void createUserTable() throws DataAccessException {
+        try {
+            String statement = """
+                CREATE TABLE IF NOT EXISTS `chess`.`user` (
+                    `username` VARCHAR(255),
+                    `password` VARCHAR(255),
+                    `email` VARCHAR(255),
+                    PRIMARY KEY ('username')
+                );
+                """;
+            var conn = DriverManager.getConnection(connectionUrl, user, password);
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
+    }
+
+    static void createGameTable() throws DataAccessException {
+        try {
+            String statement = """
+                CREATE TABLE IF NOT EXISTS `chess`.`auth` (
+                    `id` INT NOT NULL AUTO_INCREMENT,
+                    `whiteUsername` VARCHAR(255),
+                    `blackUsername` VARCHAR(255),
+                    `name` VARCHAR(255)
+                    `game` VARCHAR(255)
+                    PRIMARY KEY ('id')
+                );
+                """;
+            var conn = DriverManager.getConnection(connectionUrl, user, password);
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage());
         }
     }
 
@@ -65,6 +126,55 @@ public class DatabaseManager {
             return conn;
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
+        }
+    }
+
+    protected static int executeUpdate(String statement, Object... params) throws DataAccessException {
+        try (var conn = getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+                for (int i = 0; i < params.length; i++) {
+                    var param = params[i];
+                    if (param instanceof String p) {
+                        ps.setString(i + 1, p);
+                    } else if (param instanceof Integer p) {
+                        ps.setInt(i + 1, p);
+                    } else if (param == null) {
+                        ps.setNull(i + 1, NULL);
+                    }
+                }
+                ps.executeUpdate();
+
+                var rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+
+                return 0;
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, ex.getMessage()));
+        }
+    }
+
+    protected static ResultSet executeQuery(String statement, Object... params) throws DataAccessException {
+        try (var conn = getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+                for (int i = 0; i < params.length; i++) {
+                    var param = params[i];
+                    if (param instanceof String p) {
+                        ps.setString(i + 1, p);
+                    } else if (param instanceof Integer p) {
+                        ps.setInt(i + 1, p);
+                    } else if (param == null) {
+                        ps.setNull(i + 1, NULL);
+                    }
+                }
+
+                return ps.executeQuery();
+
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, ex.getMessage()));
         }
     }
 }

@@ -15,7 +15,7 @@ public class MemoryAuthDAO implements AuthDAO {
     }
 
     @Override
-    public String createAuth(String username) {
+    public String createAuth(String username) throws DataAccessException {
         String token = UUID.randomUUID().toString();
         AuthData newData = new AuthData(token, username);
         auths.put(token, newData);
