@@ -78,7 +78,10 @@ public class SQLAuthDAO implements AuthDAO {
                 WHERE `token` = ?
                 """;
         try {
-            DatabaseManager.executeUpdate(statement, authToken);
+            int rowsUpdated = DatabaseManager.executeUpdate(statement, authToken);
+            if (rowsUpdated == 0) {
+                throw new DataAccessException("Auth token not found");
+            }
         } catch (DataAccessException ex) {
             throw new DataAccessException("Auth token not found");
         }
