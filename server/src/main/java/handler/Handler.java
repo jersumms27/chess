@@ -8,7 +8,7 @@ public interface Handler {
     AuthDAO authDAO = new SQLAuthDAO();
 
     UserDAO userDAO = new SQLUserDAO();
-    GameDAO gameDAO = new MemoryGameDAO();
+    GameDAO gameDAO = new SQLGameDAO();
 
     ClearService clearService = new ClearService(authDAO, userDAO, gameDAO);
     UserService userService = new UserService(authDAO, userDAO);

@@ -94,8 +94,8 @@ public class DatabaseManager {
         try {
             String statement = """
                 CREATE TABLE IF NOT EXISTS`""" + databaseName + """
-                `.`auth` (
-                `id` INT NOT NULL AUTO_INCREMENT,
+                `.`game` (
+                `id` INT NOT NULL,
                 `whiteUsername` VARCHAR(255),
                 `blackUsername` VARCHAR(255),
                 `name` VARCHAR(255)

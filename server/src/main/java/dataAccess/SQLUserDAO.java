@@ -23,7 +23,7 @@ public class SQLUserDAO implements UserDAO {
         try {
             DatabaseManager.executeUpdate(statement);
         } catch (DataAccessException ex) {
-            throw new DataAccessException("Auth token not found");
+            throw new DataAccessException("User not found");
         }
     }
 
