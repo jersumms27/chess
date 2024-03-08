@@ -6,6 +6,7 @@ import service.*;
 
 public interface Handler {
     AuthDAO authDAO = new SQLAuthDAO();
+
     UserDAO userDAO = new MemoryUserDAO();
     GameDAO gameDAO = new MemoryGameDAO();
 

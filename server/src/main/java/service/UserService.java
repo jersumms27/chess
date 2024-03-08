@@ -27,10 +27,11 @@ public class UserService {
         }
         try {
             userDAO.createUser(new UserData(request.username(), request.password(), request.email()));
+            authToken = authDAO.createAuth(request.username());
         } catch (DataAccessException ex2) {
             return new RegisterResponse(null, null, "Error: already taken"); //[403]
         }
-        authToken = authDAO.createAuth(request.username());
+
         return new RegisterResponse(request.username(), authToken, ""); //[200]
     }
 

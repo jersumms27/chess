@@ -23,7 +23,7 @@ class UserServiceTest {
 
     @AfterEach
     void tearDown() {
-        authDAO.clear();
+        //authDAO.clear();
         userDAO.clear();
     }
 

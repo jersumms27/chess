@@ -96,6 +96,7 @@ public class Server {
     }
 
     private Object joinGame(Request request, Response response) {
+        System.out.println(request.body());
         String joinGameResponse = gameHandler.joinGame(request.headers("authorization"), request.body());
         String message = (new Gson()).fromJson(joinGameResponse, JoinGameResponse.class).message();
         if (message.isEmpty()) {

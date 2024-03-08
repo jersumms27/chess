@@ -1,6 +1,7 @@
 package dataAccess;
 
 import model.AuthData;
+import org.springframework.security.core.parameters.P;
 
 import java.sql.ResultSet;
 import java.sql.SQLDataException;
@@ -8,9 +9,24 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 public class SQLAuthDAO implements AuthDAO {
+    public SQLAuthDAO() {
+        try {
+            DatabaseManager.createDatabase();
+            DatabaseManager.createAuthTable();
+        } catch (DataAccessException ex) {
+        }
+    }
     @Override
-    public void clear() {
+    public void clear() throws DataAccessException {
+        String statement = """
+                DELETE FROM `chess`.`auth`;
+                """;
 
+        try {
+            DatabaseManager.executeUpdate(statement);
+        } catch (DataAccessException ex) {
+            throw new DataAccessException("Auth token not found");
+        }
     }
 
     @Override
@@ -37,11 +53,20 @@ public class SQLAuthDAO implements AuthDAO {
                WHERE `token` = ?;
                """;
 
-       ResultSet resultSet = null;
+       //ResultSet resultSet = null;
        try {
-           resultSet = DatabaseManager.executeQuery(statement, authToken);
-           return new AuthData(resultSet.getString("token"), resultSet.getString("username"));
-       } catch (DataAccessException | SQLException ex) {
+           System.out.println("starting select");
+           try (ResultSet resultSet = DatabaseManager.executeQuery(statement, authToken)) {
+               if (resultSet.next()) {
+                   String token = resultSet.getString("token");
+                   String username = resultSet.getString("username");
+                   return new AuthData(token, username);
+               } else {
+                   throw new DataAccessException("Auth token not found");
+               }
+           }
+       } catch (SQLException ex) {
+           System.out.println(ex.getMessage());
            throw new DataAccessException("Auth token not found");
        }
     }
@@ -67,10 +92,14 @@ public class SQLAuthDAO implements AuthDAO {
                WHERE `token` = ?;
                """;
 
-        ResultSet resultSet = null;
         try {
-            resultSet = DatabaseManager.executeQuery(statement, authToken);
-            return resultSet.getString("user");
+            try(ResultSet resultSet = DatabaseManager.executeQuery(statement, authToken)) {
+                if (resultSet.next()) {
+                    return resultSet.getString("username");
+                } else {
+                    throw new DataAccessException("User not found");
+                }
+            }
         } catch (DataAccessException | SQLException ex) {
             throw new DataAccessException("User not found");
         }

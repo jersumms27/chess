@@ -16,9 +16,13 @@ public class ClearService {
     // parameter:
     // return:
     public ClearResponse clear() {
-        authDAO.clear();
-        userDAO.clear();
-        gameDAO.clear();
+        try {
+            authDAO.clear();
+            userDAO.clear();
+            gameDAO.clear();
+        } catch (DataAccessException ex) {
+
+        }
 
         return new ClearResponse("");
     }

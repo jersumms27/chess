@@ -40,11 +40,12 @@ public class DatabaseManager {
     static void createDatabase() throws DataAccessException {
         try {
             var statement = "CREATE SCHEMA IF NOT EXISTS " + databaseName;
-            var conn = DriverManager.getConnection(connectionUrl, user, password);
-            try (var preparedStatement = conn.prepareStatement(statement)) {
+            try (var conn = DriverManager.getConnection(connectionUrl, user, password);
+                 var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
+            System.out.println(e.getMessage());
             throw new DataAccessException(e.getMessage());
         }
     }
@@ -55,7 +56,7 @@ public class DatabaseManager {
                 CREATE TABLE IF NOT EXISTS `chess`.`auth` (
                     `token` VARCHAR(255) NOT NULL,
                     `username` VARCHAR(255) NOT NULL,
-                    PRIMARY KEY ('token')
+                    PRIMARY KEY (`token`)
                 );
                 """;
             var conn = DriverManager.getConnection(connectionUrl, user, password);
@@ -63,6 +64,7 @@ public class DatabaseManager {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
             throw new DataAccessException(ex.getMessage());
         }
     }
@@ -74,7 +76,7 @@ public class DatabaseManager {
                     `username` VARCHAR(255),
                     `password` VARCHAR(255),
                     `email` VARCHAR(255),
-                    PRIMARY KEY ('username')
+                    PRIMARY KEY (`username`)
                 );
                 """;
             var conn = DriverManager.getConnection(connectionUrl, user, password);
@@ -95,7 +97,7 @@ public class DatabaseManager {
                     `blackUsername` VARCHAR(255),
                     `name` VARCHAR(255)
                     `game` VARCHAR(255)
-                    PRIMARY KEY ('id')
+                    PRIMARY KEY (`id`)
                 );
                 """;
             var conn = DriverManager.getConnection(connectionUrl, user, password);
@@ -134,12 +136,12 @@ public class DatabaseManager {
             try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (int i = 0; i < params.length; i++) {
                     var param = params[i];
-                    if (param instanceof String p) {
-                        ps.setString(i + 1, p);
-                    } else if (param instanceof Integer p) {
-                        ps.setInt(i + 1, p);
-                    } else if (param == null) {
-                        ps.setNull(i + 1, NULL);
+                    switch (param) {
+                        case String p -> ps.setString(i + 1, p);
+                        case Integer p -> ps.setInt(i + 1, p);
+                        case null -> ps.setNull(i + 1, NULL);
+                        default -> {
+                        }
                     }
                 }
                 ps.executeUpdate();
@@ -157,22 +159,20 @@ public class DatabaseManager {
     }
 
     protected static ResultSet executeQuery(String statement, Object... params) throws DataAccessException {
-        try (var conn = getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                for (int i = 0; i < params.length; i++) {
-                    var param = params[i];
-                    if (param instanceof String p) {
-                        ps.setString(i + 1, p);
-                    } else if (param instanceof Integer p) {
-                        ps.setInt(i + 1, p);
-                    } else if (param == null) {
-                        ps.setNull(i + 1, NULL);
+        try {
+            var conn = getConnection();
+            PreparedStatement ps = conn.prepareStatement(statement);
+            for (int i = 0; i < params.length; i++) {
+                var param = params[i];
+                switch (param) {
+                    case String p -> ps.setString(i + 1, p);
+                    case Integer p -> ps.setInt(i + 1, p);
+                    case null -> ps.setNull(i + 1, NULL);
+                    default -> {
                     }
                 }
-
-                return ps.executeQuery();
-
             }
+            return ps.executeQuery();
         } catch (SQLException ex) {
             throw new DataAccessException(String.format("unable to update database: %s, %s", statement, ex.getMessage()));
         }
