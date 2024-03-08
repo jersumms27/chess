@@ -7,7 +7,7 @@ import service.*;
 public interface Handler {
     AuthDAO authDAO = new SQLAuthDAO();
 
-    UserDAO userDAO = new MemoryUserDAO();
+    UserDAO userDAO = new SQLUserDAO();
     GameDAO gameDAO = new MemoryGameDAO();
 
     ClearService clearService = new ClearService(authDAO, userDAO, gameDAO);

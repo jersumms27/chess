@@ -19,7 +19,7 @@ public class SQLAuthDAO implements AuthDAO {
     @Override
     public void clear() throws DataAccessException {
         String statement = """
-                DELETE FROM `chess`.`auth`;
+                DELETE FROM `auth`;
                 """;
 
         try {
@@ -33,7 +33,7 @@ public class SQLAuthDAO implements AuthDAO {
     public String createAuth(String username) throws DataAccessException {
         String token = UUID.randomUUID().toString();
         String statement = """
-                INSERT INTO `chess`.`auth` (`token`, `username`)
+                INSERT INTO `auth` (`token`, `username`)
                 VALUES (?, ?);
                 """;
         try {
@@ -48,14 +48,12 @@ public class SQLAuthDAO implements AuthDAO {
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
        String statement = """
-               SELECT `token`, `username`
-               FROM `chess`.`auth`
+               SELECT *
+               FROM `auth`
                WHERE `token` = ?;
                """;
 
-       //ResultSet resultSet = null;
        try {
-           System.out.println("starting select");
            try (ResultSet resultSet = DatabaseManager.executeQuery(statement, authToken)) {
                if (resultSet.next()) {
                    String token = resultSet.getString("token");
@@ -66,7 +64,6 @@ public class SQLAuthDAO implements AuthDAO {
                }
            }
        } catch (SQLException ex) {
-           System.out.println(ex.getMessage());
            throw new DataAccessException("Auth token not found");
        }
     }
@@ -74,7 +71,7 @@ public class SQLAuthDAO implements AuthDAO {
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
         String statement = """
-                DELETE FROM `chess`.`auth`
+                DELETE FROM `auth`
                 WHERE `token` = ?
                 """;
         try {
@@ -91,7 +88,7 @@ public class SQLAuthDAO implements AuthDAO {
     public String getUser(String authToken) throws DataAccessException {
         String statement = """
                SELECT `token`, `username`
-               FROM `chess`.`auth`
+               FROM `auth`
                WHERE `token` = ?;
                """;
 

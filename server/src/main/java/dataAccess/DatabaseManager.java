@@ -53,7 +53,7 @@ public class DatabaseManager {
     static void createAuthTable() throws DataAccessException {
         try {
             String statement = """
-                CREATE TABLE IF NOT EXISTS `chess`.`auth` (
+                CREATE TABLE IF NOT EXISTS databaseName.`auth` (
                     `token` VARCHAR(255) NOT NULL,
                     `username` VARCHAR(255) NOT NULL,
                     PRIMARY KEY (`token`)
@@ -72,7 +72,7 @@ public class DatabaseManager {
     static void createUserTable() throws DataAccessException {
         try {
             String statement = """
-                CREATE TABLE IF NOT EXISTS `chess`.`user` (
+                CREATE TABLE IF NOT EXISTS databaseName.`user` (
                     `username` VARCHAR(255),
                     `password` VARCHAR(255),
                     `email` VARCHAR(255),
@@ -91,7 +91,7 @@ public class DatabaseManager {
     static void createGameTable() throws DataAccessException {
         try {
             String statement = """
-                CREATE TABLE IF NOT EXISTS `chess`.`auth` (
+                CREATE TABLE IF NOT EXISTS databaseName.`auth` (
                     `id` INT NOT NULL AUTO_INCREMENT,
                     `whiteUsername` VARCHAR(255),
                     `blackUsername` VARCHAR(255),
