@@ -25,7 +25,6 @@ public class GameHandler implements Handler {
     // parameter: authToken, playerColor, gameID
     // return:
     public String joinGame(String authToken, String requestString) {
-        System.out.println(requestString);
         JoinGameRequest requestObject = serializer.fromJson(requestString, JoinGameRequest.class);
         JoinGameResponse responseObject = gameService.joinGame(authToken, requestObject);
         return serializer.toJson(responseObject);

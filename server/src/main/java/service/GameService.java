@@ -24,11 +24,10 @@ public class GameService {
         //Verify authToken
         try {
             authDAO.getAuth(authToken);
+            return new ListGamesResponse(gameDAO.listGames(), "");
         } catch (DataAccessException ex) {
             return new ListGamesResponse(null, "Error: unauthorized");
         }
-
-        return new ListGamesResponse(gameDAO.listGames(), "");
     }
 
     // parameter: gameName
@@ -40,8 +39,11 @@ public class GameService {
         } catch (DataAccessException ex) {
             return new CreateGameResponse(null, "Error: unauthorized"); //[401]
         }
-
-        return new CreateGameResponse(String.valueOf((gameDAO.createGame(request.gameName()).gameID())), "");
+        try {
+            return new CreateGameResponse(String.valueOf((gameDAO.createGame(request.gameName()).gameID())), "");
+        } catch (DataAccessException ex2) {
+            return new CreateGameResponse(null, "Error: bad request"); //[400]
+        }
     }
 
     // parameter: authToken, playerColor, gameID
