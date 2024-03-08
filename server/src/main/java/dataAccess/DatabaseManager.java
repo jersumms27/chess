@@ -45,7 +45,6 @@ public class DatabaseManager {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
             throw new DataAccessException(e.getMessage());
         }
     }
@@ -65,7 +64,6 @@ public class DatabaseManager {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
             throw new DataAccessException(ex.getMessage());
         }
     }
@@ -93,13 +91,13 @@ public class DatabaseManager {
     static void createGameTable() throws DataAccessException {
         try {
             String statement = """
-                CREATE TABLE IF NOT EXISTS`""" + databaseName + """
+                CREATE TABLE IF NOT EXISTS `""" + databaseName + """
                 `.`game` (
                 `id` INT NOT NULL,
                 `whiteUsername` VARCHAR(255),
                 `blackUsername` VARCHAR(255),
-                `name` VARCHAR(255)
-                `game` VARCHAR(255)
+                `name` VARCHAR(255),
+                `game` VARCHAR(255),
                 PRIMARY KEY (`id`)
                 );
                 """;

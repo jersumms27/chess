@@ -51,7 +51,6 @@ public class SQLGameDAO implements GameDAO {
         } catch (DataAccessException ex) {
             throw new DataAccessException("Game already created");
         }
-
         return data;
     }
 
@@ -112,7 +111,7 @@ public class SQLGameDAO implements GameDAO {
     @Override
     public void updateGame(GameData data) throws DataAccessException {
         String deleteStatement = """
-                DELETE FROM `game`;
+                DELETE FROM `game`
                 WHERE `id` = ?;
                 """;
         try {
@@ -129,7 +128,7 @@ public class SQLGameDAO implements GameDAO {
         try {
             String chessGameString = (new Gson()).toJson(data.game());
             DatabaseManager.executeUpdate(statement, data.gameID(), data.whiteUsername(), data.blackUsername(), data.gameName(), chessGameString);
-        } catch (DataAccessException ex) {
+        } catch (DataAccessException ex2) {
             throw new DataAccessException("Game already created");
         }
     }
@@ -152,8 +151,8 @@ public class SQLGameDAO implements GameDAO {
         }
 
         try (ResultSet resultSet = DatabaseManager.executeQuery(statement, id)) {
-            if ((color.equals("WHITE") && resultSet.next() && !resultSet.getString("whiteUsername").isEmpty())
-            || color.equals("BLACK") && resultSet.next() && !resultSet.getString("blackUsername").isEmpty()) {
+            if ((color.equals("WHITE") && resultSet.next() && resultSet.getString("whiteUsername") != null)
+            || color.equals("BLACK") && resultSet.next() && resultSet.getString("blackUsername") != null) {
                 throw new DataAccessException("Color not available");
             }
         } catch (SQLException ex) {
