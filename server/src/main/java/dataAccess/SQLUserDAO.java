@@ -45,7 +45,7 @@ public class SQLUserDAO implements UserDAO {
         String statement = """
                 SELECT *
                 FROM `user`
-                WHERE `username` = ?'
+                WHERE `username` = ?;
                 """;
 
         try {
