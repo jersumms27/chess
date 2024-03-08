@@ -53,10 +53,11 @@ public class DatabaseManager {
     static void createAuthTable() throws DataAccessException {
         try {
             String statement = """
-                CREATE TABLE IF NOT EXISTS databaseName.`auth` (
-                    `token` VARCHAR(255) NOT NULL,
-                    `username` VARCHAR(255) NOT NULL,
-                    PRIMARY KEY (`token`)
+                CREATE TABLE IF NOT EXISTS `""" + databaseName + """
+                `.`auth` (
+                `token` VARCHAR(255) NOT NULL,
+                `username` VARCHAR(255) NOT NULL,
+                PRIMARY KEY (`token`)
                 );
                 """;
             var conn = DriverManager.getConnection(connectionUrl, user, password);
@@ -72,11 +73,12 @@ public class DatabaseManager {
     static void createUserTable() throws DataAccessException {
         try {
             String statement = """
-                CREATE TABLE IF NOT EXISTS databaseName.`user` (
-                    `username` VARCHAR(255),
-                    `password` VARCHAR(255),
-                    `email` VARCHAR(255),
-                    PRIMARY KEY (`username`)
+                CREATE TABLE IF NOT EXISTS `""" + databaseName + """
+                `.`user` (
+                `username` VARCHAR(255),
+                `password` VARCHAR(255),
+                `email` VARCHAR(255),
+                PRIMARY KEY (`username`)
                 );
                 """;
             var conn = DriverManager.getConnection(connectionUrl, user, password);
@@ -91,13 +93,14 @@ public class DatabaseManager {
     static void createGameTable() throws DataAccessException {
         try {
             String statement = """
-                CREATE TABLE IF NOT EXISTS databaseName.`auth` (
-                    `id` INT NOT NULL AUTO_INCREMENT,
-                    `whiteUsername` VARCHAR(255),
-                    `blackUsername` VARCHAR(255),
-                    `name` VARCHAR(255)
-                    `game` VARCHAR(255)
-                    PRIMARY KEY (`id`)
+                CREATE TABLE IF NOT EXISTS`""" + databaseName + """
+                `.`auth` (
+                `id` INT NOT NULL AUTO_INCREMENT,
+                `whiteUsername` VARCHAR(255),
+                `blackUsername` VARCHAR(255),
+                `name` VARCHAR(255)
+                `game` VARCHAR(255)
+                PRIMARY KEY (`id`)
                 );
                 """;
             var conn = DriverManager.getConnection(connectionUrl, user, password);

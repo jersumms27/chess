@@ -66,6 +66,9 @@ public class SQLUserDAO implements UserDAO {
 
     @Override
     public void checkPassword(String username, String password) throws DataAccessException {
-
+        UserData data = getUser(username);
+        if (!data.password().equals(password)) {
+            throw new DataAccessException("Wrong password");
+        }
     }
 }
