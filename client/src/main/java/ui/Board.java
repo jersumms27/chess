@@ -14,17 +14,17 @@ public class Board {
     private static final String WIDTH_SPACE = "  ";
 
 
-    public static void main(String[] args) {
-        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+    //public static void main(String[] args) {
+    //    var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
-        out.print(ERASE_SCREEN);
-        ChessBoard board = new ChessBoard();
-        board.resetBoard();;
+    //    out.print(ERASE_SCREEN);
+    //    ChessBoard board = new ChessBoard();
+    //    board.resetBoard();
 
-        drawBoard(out, board, false);
-        out.println();
-        drawBoard(out, board, true);
-    }
+    //    drawBoard(out, board, false);
+    //    out.println();
+    //    drawBoard(out, board, true);
+    //}
 
     public static void drawBoard(PrintStream out, ChessBoard board, boolean inverted) {
         String[] regularRowHeader = {"a", "b", "c", "d", "e", "f", "g", "h"};
@@ -44,9 +44,20 @@ public class Board {
 
         drawHeader(out, rowHeader);
         out.println();
-        for (int r = 0; r < NUM_SQUARES; r++) {
+        int startRow = 0;
+        int endRow = NUM_SQUARES;
+        int incrementRow = 1;
+        if (inverted) {
+            startRow = NUM_SQUARES - 1;
+            endRow = -1;
+            incrementRow = -1;
+        }
+        for (int r = startRow; (r - endRow) * (r - endRow) != 0; r += incrementRow) {
             ChessPiece[] pieces = new ChessPiece[NUM_SQUARES];
-            for (int p = 0; p < NUM_SQUARES; p++) {
+            int startCol = startRow;
+            int endCol = endRow;
+            int incrementCol = incrementRow;
+            for (int p = startCol; (p - endCol) * (p - endCol) != 0; p += incrementCol) {
                 pieces[p] = board.getPiece(new ChessPosition(r + 1, p + 1));
             }
             drawRow(out, pieces, colHeader[r], r);
@@ -60,6 +71,7 @@ public class Board {
         out.print(SET_BG_COLOR_LIGHT_GREY);
         out.print(" ");
         for (int h = 0; h < NUM_SQUARES; h++) {
+            out.print(SET_TEXT_COLOR_BLACK);
             out.print(WIDTH_SPACE + header[h] + WIDTH_SPACE);
         }
     }
@@ -67,6 +79,7 @@ public class Board {
     public static void drawRow(PrintStream out, ChessPiece[] pieces, String header, int rowNumber) {
         for (int c = 0; c < NUM_SQUARES + 2; c++) {
             if (c == 0 || c == NUM_SQUARES + 1) {
+                out.print(SET_TEXT_COLOR_BLACK);
                 out.print(SET_BG_COLOR_LIGHT_GREY);
                 out.print(header);
             } else {
@@ -75,30 +88,35 @@ public class Board {
                 } else {
                     out.print(SET_BG_COLOR_BLACK);
                 }
-                out.print(pieceToString(pieces[c - 1]));
+                out.print(pieceToString(out, pieces[c - 1]));
             }
         }
     }
 
-    private static String pieceToString(ChessPiece piece) {
+    private static String pieceToString(PrintStream out, ChessPiece piece) {
         if (piece == null) {
             return WIDTH_SPACE + " " + WIDTH_SPACE;
         }
         String str = "";
+        if (piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
+            out.print(SET_TEXT_COLOR_BLUE);
+        } else {
+            out.print(SET_TEXT_COLOR_RED);
+        }
 
         ChessPiece.PieceType type = piece.getPieceType();
         if (type == ChessPiece.PieceType.PAWN) {
-            str =  "P";
+            str = "P";
         } else if (type == ChessPiece.PieceType.ROOK) {
-            str =  "R";
+            str = "R";
         } else if (type == ChessPiece.PieceType.KNIGHT) {
-            str =  "N";
+            str = "N";
         } else if (type == ChessPiece.PieceType.BISHOP) {
-            str =  "B";
+            str = "B";
         } else if (type == ChessPiece.PieceType.QUEEN) {
-            str =  "Q";
+            str = "Q";
         } else {
-            str =  "K";
+            str = "K";
         }
 
         return WIDTH_SPACE + str + WIDTH_SPACE;
