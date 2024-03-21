@@ -11,6 +11,7 @@ public class UserHandler implements Handler {
     // parameter: username, password, email
     // return: username, authToken
     public String register(String requestString) {
+        System.out.println("yeet");
         RegisterRequest requestObject = serializer.fromJson(requestString, RegisterRequest.class);
         RegisterResponse responseObject = userService.register(requestObject);
         return serializer.toJson(responseObject);

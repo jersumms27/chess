@@ -4,22 +4,24 @@ public class Menu {
     private boolean loggedIn;
     private boolean quit;
     Scanner scanner;
+    ServerFacade serverFacade;
 
-    public Menu() {
+    public Menu() throws Exception {
         loggedIn = false;
         quit = false;
         scanner = new Scanner(System.in);
+        serverFacade = new ServerFacade();
 
         System.out.println("Welcome to chess");
         helpPrelogin();
         preloginMenu();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         Menu menu = new Menu();
     }
 
-    public void preloginMenu() {
+    public void preloginMenu() throws Exception {
         while (!quit) {
             String input = scanner.nextLine();
 
@@ -67,7 +69,7 @@ public class Menu {
         quit = true;
     }
 
-    private void login() {
+    private void login() throws Exception {
         loggedIn = true;
         System.out.println("Enter username and password:");
         String input = scanner.nextLine();
@@ -75,11 +77,19 @@ public class Menu {
         String username = arguments[0];
         String password = arguments[1];
 
+        serverFacade.performAction("http://localhost:8080/session", "POST", "{ \"username\": \"" + username + "\", \"password\": \"" + password + "\" }");
         postloginMenu();
     }
 
-    private void register() {
+    private void register() throws Exception {
+        System.out.println("Enter username, password, email:");
+        String input = scanner.nextLine();
+        String[] arguments = input.split(" ");
+        String username = arguments[0];
+        String password = arguments[1];
+        String email = arguments[2];
 
+        serverFacade.performAction("http://localhost:8080/user", "POST", "{ \"username\": \"" + username + "\", \"password\": \"" + password + "\", \"email\": " + email + "\" }");
     }
 
     private void helpPostlogin() {

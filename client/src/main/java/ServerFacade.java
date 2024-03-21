@@ -18,6 +18,7 @@ public class ServerFacade {
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
         http.setRequestMethod(method);
         writeRequestBody(body, http);
+        System.out.println("Made body");
         http.connect();
 
         return http;
@@ -37,6 +38,9 @@ public class ServerFacade {
         String statusMessage = http.getResponseMessage();
 
         Object responseBody = readResponseBody(http);
+        System.out.println("Status code: " + statusCode);
+        System.out.println("Status message" + statusMessage);
+        System.out.println("Response body: " + responseBody);
     }
 
     private Object readResponseBody(HttpURLConnection http) throws Exception {

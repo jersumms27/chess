@@ -36,6 +36,7 @@ public class Server {
     }
 
     private Object register(Request request, Response response) {
+        System.out.println("Made it into server register method");
         String registerResponse = userHandler.register(request.body());
         String message = (new Gson()).fromJson(registerResponse, RegisterResponse.class).message();
         if (message.isEmpty()) {
@@ -48,6 +49,7 @@ public class Server {
     }
 
     private Object login(Request request, Response response) {
+        System.out.println("Made it to the actual server login method");
         String loginResponse = userHandler.login(request.body());
         String message = (new Gson()).fromJson(loginResponse, LoginResponse.class).message();
         if (message.isEmpty()) {
