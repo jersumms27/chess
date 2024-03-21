@@ -1,19 +1,24 @@
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Menu {
     private boolean loggedIn;
     private boolean quit;
+    private String authToken;
+    private Map<String, String> authHeader;
     Scanner scanner;
     ServerFacade serverFacade;
 
     public Menu() throws Exception {
         loggedIn = false;
         quit = false;
+        authToken = "";
+        authHeader = new HashMap<>();
         scanner = new Scanner(System.in);
         serverFacade = new ServerFacade();
 
-        System.out.println("Welcome to chess");
-        helpPrelogin();
+        System.out.println("Welcome to chess!");
         preloginMenu();
     }
 
@@ -37,7 +42,7 @@ public class Menu {
         }
     }
 
-    public void postloginMenu() {
+    public void postloginMenu() throws Exception {
         while (loggedIn) {
             String input = scanner.nextLine();
 
@@ -77,7 +82,9 @@ public class Menu {
         String username = arguments[0];
         String password = arguments[1];
 
-        serverFacade.performAction("http://localhost:8080/session", "POST", "{ \"username\": \"" + username + "\", \"password\": \"" + password + "\" }");
+        Map<String, String> response = serverFacade.performAction("http://localhost:8080/session", "POST", "{ \"username\": \"" + username + "\", \"password\": \"" + password + "\" }", null);
+        authToken = response.get("authToken");
+        authHeader.put("authorization", authToken);
         postloginMenu();
     }
 
@@ -89,7 +96,13 @@ public class Menu {
         String password = arguments[1];
         String email = arguments[2];
 
-        serverFacade.performAction("http://localhost:8080/user", "POST", "{ \"username\": \"" + username + "\", \"password\": \"" + password + "\", \"email\": " + email + "\" }");
+        serverFacade.performAction("http://localhost:8080/user", "POST", "{ \"username\": \"" + username + "\", \"password\": \"" + password + "\", \"email\": " + email + "\" }", null);
+        // Login
+        Map<String, String> response = serverFacade.performAction("http://localhost:8080/session", "POST", "{ \"username\": \"" + username + "\", \"password\": \"" + password + "\" }", null);
+        authToken = response.get("authToken");
+        authHeader.put("authorization", authToken);
+        postloginMenu();
+
     }
 
     private void helpPostlogin() {
@@ -101,23 +114,35 @@ public class Menu {
         System.out.println("OBSERVE - Prompts for which game to observe");
     }
 
-    private void logout() {
+    private void logout() throws Exception {
         loggedIn = false;
+        serverFacade.performAction("http://localhost:8080/session", "DELETE", "{}", authHeader);
     }
 
-    private void createGame() {
-
+    private void createGame() throws Exception {
+        System.out.println("Enter game name:");
+        String name = scanner.nextLine();
+        serverFacade.performAction("http://localhost:8080/game", "POST", "{ \"gameName\": \"" + name + "\" }", authHeader);
     }
 
-    private void listGames() {
-
+    private void listGames() throws Exception {
+        serverFacade.performAction("http://localhost:8080/game", "GET", "{}", authHeader);
     }
 
-    private void joinGame() {
+    private void joinGame() throws Exception {
+        System.out.println("Enter color and game ID:");
+        String input = scanner.nextLine();
+        String[] arguments = input.split(" ");
+        String color = arguments[0];
+        String id = arguments[1];
 
+        serverFacade.performAction("http://localhost:8080/game", "PUT", "{ \"playerColor\": \"" + color + "\", \"gameID\": \"" + id + "\" }", authHeader);
     }
 
-    private void observeGame() {
+    private void observeGame() throws Exception {
+        System.out.println("Enter game ID:");
+        String id = scanner.nextLine();
 
+        serverFacade.performAction("http://localhost:8080/game", "PUT", "{ \"playerColor\": \"" + "\", \"gameID\": \"" + id + "\" }", authHeader);
     }
 }

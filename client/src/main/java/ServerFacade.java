@@ -8,17 +8,23 @@ import java.net.URISyntaxException;
 import java.util.Map;
 
 public class ServerFacade {
-    public void performAction(String url, String method, String body) throws Exception {
-        HttpURLConnection http = sendRequest(url, method, body);
-        receiveResponse(http);
+    public Map<String, String> performAction(String url, String method, String body, Map<String, String> headers) throws Exception {
+        HttpURLConnection http = sendRequest(url, method, body, headers);
+        return receiveResponse(http);
     }
 
-    private HttpURLConnection sendRequest(String url, String method, String body) throws Exception {
+    private HttpURLConnection sendRequest(String url, String method, String body, Map<String, String> headers) throws Exception {
         URI uri = new URI(url);
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
         http.setRequestMethod(method);
+
+        if (headers != null && !headers.isEmpty()) {
+            for (Map.Entry<String, String> entry: headers.entrySet()) {
+                http.setRequestProperty(entry.getKey(), entry.getValue());
+            }
+        }
+
         writeRequestBody(body, http);
-        System.out.println("Made body");
         http.connect();
 
         return http;
@@ -33,23 +39,20 @@ public class ServerFacade {
         }
     }
 
-    private void receiveResponse(HttpURLConnection http) throws Exception {
+    private Map<String, String> receiveResponse(HttpURLConnection http) throws Exception {
         int statusCode = http.getResponseCode();
         String statusMessage = http.getResponseMessage();
 
-        Object responseBody = readResponseBody(http);
-        System.out.println("Status code: " + statusCode);
-        System.out.println("Status message" + statusMessage);
-        System.out.println("Response body: " + responseBody);
+        return readResponseBody(http);
     }
 
-    private Object readResponseBody(HttpURLConnection http) throws Exception {
+    private Map<String, String> readResponseBody(HttpURLConnection http) throws Exception {
         Object responseBody = "";
         try (InputStream respBody = http.getInputStream()) {
             InputStreamReader inputStreamReader = new InputStreamReader(respBody);
             responseBody = new Gson().fromJson(inputStreamReader, Map.class);
         }
 
-        return responseBody;
+        return (Map<String, String>) responseBody;
     }
 }
