@@ -3,6 +3,8 @@ package clientTests;
 import org.junit.jupiter.api.*;
 import server.Server;
 
+import java.awt.*;
+
 
 public class ServerFacadeTests {
 
@@ -24,6 +26,11 @@ public class ServerFacadeTests {
     @Test
     public void sampleTest() {
         Assertions.assertTrue(true);
+    }
+
+    @Test
+    public void menuTest() {
+        Menu menu = new Menu();
     }
 
 }

@@ -11,6 +11,12 @@ public class Menu {
         scanner = new Scanner(System.in);
 
         System.out.println("Welcome to chess");
+        helpPrelogin();
+        preloginMenu();
+    }
+
+    public static void main(String[] args) {
+        Menu menu = new Menu();
     }
 
     public void preloginMenu() {
@@ -62,7 +68,14 @@ public class Menu {
     }
 
     private void login() {
+        loggedIn = true;
+        System.out.println("Enter username and password:");
+        String input = scanner.nextLine();
+        String[] arguments = input.split(" ");
+        String username = arguments[0];
+        String password = arguments[1];
 
+        postloginMenu();
     }
 
     private void register() {
@@ -79,7 +92,7 @@ public class Menu {
     }
 
     private void logout() {
-
+        loggedIn = false;
     }
 
     private void createGame() {
