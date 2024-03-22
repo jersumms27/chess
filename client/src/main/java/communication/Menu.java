@@ -1,10 +1,11 @@
+package communication;
+
 import chess.ChessBoard;
 import com.google.gson.Gson;
 import model.GameData;
 import response.ListGamesResponse;
 import ui.Board;
 
-import java.io.PrintStream;
 import java.util.*;
 
 public class Menu {
@@ -20,7 +21,6 @@ public class Menu {
         authToken = "";
         scanner = new Scanner(System.in);
         serverFacade = new ServerFacade();
-
         System.out.println("Welcome to chess!");
         preloginMenu();
     }
@@ -30,25 +30,44 @@ public class Menu {
     }
 
     public void preloginMenu() throws Exception {
+        boolean help = false;
         while (!quit) {
-            //System.out.println("HELP\nQUIT\nLOGIN\nREGISTER");
+            if (!help) {
+                preloginOptions();
+            }
+            help = false;
             String input = scanner.nextLine();
 
             if (input.equalsIgnoreCase("quit")) {
                 quit();
             } else if (input.equalsIgnoreCase("login")) {
                 login();
+                if (loggedIn) {
+                    postloginMenu();
+                }
             } else if (input.equalsIgnoreCase("register")) {
                 register();
+                if (loggedIn) {
+                    postloginMenu();
+                }
             } else { // "help"
+                help = true;
                 helpPrelogin();
             }
         }
     }
 
+    private void preloginOptions() {
+        System.out.println("HELP\nQUIT\nLOGIN\nREGISTER");
+    }
+
     public void postloginMenu() throws Exception {
+        boolean help = false;
         while (loggedIn) {
-            //System.out.println("HELP\nLOGOUT\nCREATE\nLIST\nJOIN\nOBSERVE");
+            if (!help) {
+                postloginOptions();
+            }
+            help = false;
             String input = scanner.nextLine();
 
             if (input.equalsIgnoreCase("logout")) {
@@ -62,10 +81,14 @@ public class Menu {
             } else if (input.equalsIgnoreCase("observe")) {
                 observeGame();
             } else { // "help"
+                help = true;
                 helpPostlogin();
             }
         }
+    }
 
+    private void postloginOptions() {
+        System.out.println("HELP\nLOGOUT\nCREATE\nLIST\nJOIN\nOBSERVE");
     }
 
     private void helpPrelogin() {
@@ -76,6 +99,7 @@ public class Menu {
     }
 
     private void quit() {
+        System.out.println("Goodbye!");
         quit = true;
     }
 
@@ -85,16 +109,18 @@ public class Menu {
         String[] arguments = input.split(" ");
         String[] bodyKeys = {"username", "password"};
         Map<String, String> response = new HashMap<>();
+        String errorString = "";
 
         try {
+            errorString = "Error: invalid input";
             String[] bodyValues = {arguments[0], arguments[1]};
+            errorString = "Error: could not log in";
             response = (Map<String, String>) serverFacade.communicate("session", "POST", bodyKeys, bodyValues, authToken);
+            authToken = response.get("authToken");
             loggedIn = true;
         } catch (Exception ex) {
-            System.out.println("Error: could not log in");
+            System.out.println(errorString);
         }
-        authToken = response.get("authToken");
-        postloginMenu();
     }
 
     private void register() throws Exception {
@@ -102,16 +128,18 @@ public class Menu {
         String input = scanner.nextLine();
         String[] arguments = input.split(" ");
         String[] bodyKeys = {"username", "password", "email"};
+        String errorString = "";
         try {
+            errorString = "Error: invalid input";
             String[] bodyValues = {arguments[0], arguments[1], arguments[2]};
+            errorString = "Error: could not register";
             serverFacade.communicate("user", "POST", bodyKeys, bodyValues, null);
             // Login
             loggedIn = true;
             Map<String, String> response = (Map<String, String>) serverFacade.communicate("session", "POST", Arrays.copyOfRange(bodyKeys, 0, 2), Arrays.copyOfRange(bodyValues, 0, 2), null);
             authToken = response.get("authToken");
-            postloginMenu();
         } catch (Exception ex) {
-            System.out.println("Error: could not register");
+            System.out.println(errorString);
         }
 
     }
@@ -147,10 +175,16 @@ public class Menu {
         String[] empty = {};
         String response = (String) serverFacade.communicate("game", "GET", empty, empty, authToken);
         Collection<GameData> games = new Gson().fromJson(response, ListGamesResponse.class).games();
-        for (GameData game: games) {
-            String output = "";
-            output += "name: " + game.gameName() + ", ID: " + game.gameID() + ", white: " + game.whiteUsername() + ", black: " + game.blackUsername();
-            System.out.println(output);
+        if (games.isEmpty()) {
+            System.out.println("No games");
+        } else {
+            int index = 1;
+            for (GameData game : games) {
+                String output = "";
+                output += "GAME " + index + ": name: " + game.gameName() + ", ID: " + game.gameID() + ", white: " + game.whiteUsername() + ", black: " + game.blackUsername();
+                System.out.println(output);
+                index ++;
+            }
         }
     }
 
@@ -161,22 +195,26 @@ public class Menu {
         String[] arguments = input.split(" ");
         String color = arguments[0];
         String[] bodyKeys = {"playerColor", "gameID"};
+        String errorString = "";
         try {
             if (!color.equalsIgnoreCase("white") && !color.equalsIgnoreCase("black")) {
+                errorString = "Error: invalid color";
                 throw new Exception();
             }
+            errorString = "Error: invalid input";
             String[] bodyValues = {arguments[0].toUpperCase(), arguments[1]};
+            errorString = "Error: could not join game";
             serverFacade.communicate("game", "PUT", bodyKeys, bodyValues, authToken);
 
             ChessBoard board = new ChessBoard();
             board.resetBoard();
-            if (color.equalsIgnoreCase("white")) {
+            if (color.equalsIgnoreCase("black")) {
                 Board.drawBoard(board, true);
             } else {
                 Board.drawBoard(board, false);
             }
         } catch (Exception ex) {
-            System.out.println("Error: could not join game");
+            System.out.println(errorString);
         }
     }
 
@@ -190,6 +228,7 @@ public class Menu {
             ChessBoard board = new ChessBoard();
             board.resetBoard();
             Board.drawBoard(board, true);
+            System.out.println();
             Board.drawBoard(board, false);
         } catch (Exception ex) {
             System.out.println("Error: could not observe game");

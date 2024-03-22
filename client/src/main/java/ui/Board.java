@@ -21,25 +21,26 @@ public class Board {
     //    ChessBoard board = new ChessBoard();
     //    board.resetBoard();
 
-    //    drawBoard(out, board, false);
+    //    drawBoard(board, false);
     //    out.println();
-    //    drawBoard(out, board, true);
+    //    drawBoard(board, true);
     //}
 
     public static void drawBoard(ChessBoard board, boolean inverted) { // default is white's perspective
         String[] regularRowHeader = {"a", "b", "c", "d", "e", "f", "g", "h"};
         String[] invertedRowHeader = {"h", "g", "f", "e", "d", "c", "b", "a"};
-        String[] regularColHeader = {"8", "7", "6", "5", "4", "3", "2", "1"};
-        String[] invertedColHeader = {"1", "2", "3", "4", "5", "6", "7", "8"};
+        String[] invertedColHeader = {"8", "7", "6", "5", "4", "3", "2", "1"};
+        String[] regularColHeader = {"1", "2", "3", "4", "5", "6", "7", "8"};
+        String[] colHeader = {"8", "7", "6", "5", "4", "3", "2", "1"};
 
         String[] rowHeader;
-        String[] colHeader;
+        //String[] colHeader;
         if (inverted) {
             rowHeader = invertedRowHeader;
-            colHeader = invertedColHeader;
+            //colHeader = invertedColHeader;
         } else {
             rowHeader = regularRowHeader;
-            colHeader = regularColHeader;
+            //colHeader = regularColHeader;
         }
 
         drawHeader(rowHeader);
@@ -52,18 +53,23 @@ public class Board {
             endRow = -1;
             incrementRow = -1;
         }
+        int actualRow = 1;
         for (int r = startRow; (r - endRow) * (r - endRow) != 0; r += incrementRow) {
             ChessPiece[] pieces = new ChessPiece[NUM_SQUARES];
             int startCol = startRow;
             int endCol = endRow;
             int incrementCol = incrementRow;
+            int c = 0;
             for (int p = startCol; (p - endCol) * (p - endCol) != 0; p += incrementCol) {
-                pieces[p] = board.getPiece(new ChessPosition(r + 1, p + 1));
+                pieces[c] = board.getPiece(new ChessPosition(r + 1, p + 1));
+                c ++;
             }
-            drawRow(pieces, colHeader[r], r);
+            drawRow(pieces, colHeader[r], actualRow);
+            actualRow ++;
             System.out.println();
         }
         drawHeader(rowHeader);
+        System.out.print(SET_TEXT_COLOR_WHITE);
         System.out.println();
     }
 
@@ -74,6 +80,8 @@ public class Board {
             System.out.print(SET_TEXT_COLOR_BLACK);
             System.out.print(WIDTH_SPACE + header[h] + WIDTH_SPACE);
         }
+        System.out.print(" ");
+        System.out.print(SET_BG_COLOR_DARK_GREY);
     }
 
     public static void drawRow(ChessPiece[] pieces, String header, int rowNumber) {
@@ -83,7 +91,7 @@ public class Board {
                 System.out.print(SET_BG_COLOR_LIGHT_GREY);
                 System.out.print(header);
             } else {
-                if (rowNumber % 2 != c % 2) {
+                if (rowNumber % 2 == c % 2) {
                     System.out.print(SET_BG_COLOR_WHITE);
                 } else {
                     System.out.print(SET_BG_COLOR_BLACK);
@@ -91,6 +99,7 @@ public class Board {
                 System.out.print(pieceToString(pieces[c - 1]));
             }
         }
+        System.out.print(SET_BG_COLOR_DARK_GREY);
     }
 
     private static String pieceToString(ChessPiece piece) {

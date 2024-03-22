@@ -1,10 +1,21 @@
+package communication;
+
+import communication.ClientCommunicator;
+
 import java.util.*;
 
 public class ServerFacade {
     ClientCommunicator communicator;
+    int port = 8080;
     public ServerFacade() {
         communicator = new ClientCommunicator();
     }
+
+    public ServerFacade(int port) {
+        communicator = new ClientCommunicator();
+        this.port = port;
+    }
+
     public Object communicate(String path, String method, String[] bodyKeys, String[] bodyValues, String authToken) throws Exception {
         Object response;
 
@@ -27,7 +38,7 @@ public class ServerFacade {
     }
 
     private String makePath(String path) {
-        return "http://localhost:8080/" + path;
+        return "http://localhost:" + port + "/" + path;
     }
 
     private String createJson(ArrayList<String> keys, ArrayList<String> values) {
