@@ -143,6 +143,59 @@ public class Menu {
     private void listGames() throws Exception {
         String[] empty = {};
         Map<String, String> response = serverFacade.communicate("game", "GET", empty, empty, authToken);
+        int index = 0;
+        for (Map.Entry<String, String> entry: response.entrySet()) {
+            if (index > 0) {
+                break;
+            }
+            System.out.println(parseGame(entry.toString()));
+            index ++;
+        }
+    }
+
+    private String parseGame(String entry) {
+        int startIndex = 0;
+        int endIndex = "gameID".length();
+        String output = "";
+        ArrayList<String> ids = new ArrayList<>();
+        ArrayList<String> names = new ArrayList<>();
+        String keyWord = "gameID";
+        while (endIndex < entry.length()) {
+            if (entry.substring(startIndex, endIndex).equals(keyWord)) {
+                if (keyWord.equals("gameID")) {
+                    ids.add(getGameValue(entry.substring(startIndex)));
+                    keyWord = "gameName";
+                } else {
+                    names.add(getGameValue(entry.substring(startIndex)));
+                    keyWord = "gameID";
+                }
+                startIndex = endIndex + 1;
+                endIndex = startIndex + keyWord.length();
+            } else {
+                startIndex++;
+                endIndex++;
+            }
+        }
+
+        for (int i = 0; i < names.size(); i++) {
+            output += "name: " + names.get(i) + ", ID: " + ids.get(i) + "\n";
+        }
+
+        return output;
+    }
+
+    private String getGameValue(String entry) {
+        String output = "";
+        int startIndex = 0;
+        while (entry.charAt(startIndex) != '=') {
+            startIndex ++;
+        }
+        startIndex ++;
+        int endIndex = startIndex + 1;
+        while (entry.charAt(endIndex) != ',' && entry.charAt(endIndex) != '}') {
+            endIndex ++;
+        }
+        return entry.substring(startIndex, endIndex);
     }
 
     private void joinGame() throws Exception {
@@ -177,6 +230,10 @@ public class Menu {
         String[] bodyValues = {null, id};
         try {
             serverFacade.communicate("game", "PUT", bodyKeys, bodyValues, authToken);
+            ChessBoard board = new ChessBoard();
+            board.resetBoard();
+            Board.drawBoard(board, true);
+            Board.drawBoard(board, false);
         } catch (Exception ex) {
             System.out.println("Error: could not observe game");
         }
