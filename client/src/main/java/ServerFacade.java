@@ -1,58 +1,48 @@
-import com.google.gson.Gson;
-
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Map;
+import java.util.*;
 
 public class ServerFacade {
-    public Map<String, String> performAction(String url, String method, String body, Map<String, String> headers) throws Exception {
-        HttpURLConnection http = sendRequest(url, method, body, headers);
-        return receiveResponse(http);
+    ClientCommunicator communicator;
+    public ServerFacade() {
+        communicator = new ClientCommunicator();
+    }
+    public Map<String, String> communicate(String path, String method, String[] bodyKeys, String[] bodyValues, String authToken) throws Exception {
+        Map<String, String> response;
+
+        String url = makePath(path);
+        String body = createJson(new ArrayList<>(Arrays.asList(bodyKeys)), new ArrayList<>(Arrays.asList(bodyValues)));
+        Map<String, String> header = new HashMap<>();
+        if (bodyKeys.length == 0 && Objects.equals(authToken, "")) {
+            response = communicator.performAction(url, method, "{}", null);
+        } else if (bodyKeys.length == 0) {
+            header.put("authorization", authToken);
+            response = communicator.performAction(url, method, "", header);
+        } else if (Objects.equals(authToken, "")) {
+            response = communicator.performAction(url, method, body, null);
+        } else {
+            header.put("authorization", authToken);
+            response = communicator.performAction(url, method, body, header);
+        }
+        return response;
+
     }
 
-    private HttpURLConnection sendRequest(String url, String method, String body, Map<String, String> headers) throws Exception {
-        URI uri = new URI(url);
-        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
-        http.setRequestMethod(method);
+    private String makePath(String path) {
+        return "http://localhost:8080/" + path;
+    }
 
-        if (headers != null && !headers.isEmpty()) {
-            for (Map.Entry<String, String> entry: headers.entrySet()) {
-                http.setRequestProperty(entry.getKey(), entry.getValue());
-            }
+    private String createJson(ArrayList<String> keys, ArrayList<String> values) {
+        String body = "";
+        if (keys.isEmpty()) {
+            return "{}";
         }
 
-        writeRequestBody(body, http);
-        http.connect();
-
-        return http;
-    }
-
-    private void writeRequestBody(String body, HttpURLConnection http) throws Exception {
-        if (!body.isEmpty()) {
-            http.setDoOutput(true);
-            try (var outputStream = http.getOutputStream()) {
-                outputStream.write(body.getBytes());
-            }
+        body += "{ ";
+        for (int i = 0; i < keys.size(); i++) {
+            body += "\"" + keys.get(i) + "\": \"" + values.get(i) + "\", ";
         }
-    }
+        body = body.substring(0, body.length() - 2);
+        body += " }";
 
-    private Map<String, String> receiveResponse(HttpURLConnection http) throws Exception {
-        int statusCode = http.getResponseCode();
-        String statusMessage = http.getResponseMessage();
-
-        return readResponseBody(http);
-    }
-
-    private Map<String, String> readResponseBody(HttpURLConnection http) throws Exception {
-        Object responseBody = "";
-        try (InputStream respBody = http.getInputStream()) {
-            InputStreamReader inputStreamReader = new InputStreamReader(respBody);
-            responseBody = new Gson().fromJson(inputStreamReader, Map.class);
-        }
-
-        return (Map<String, String>) responseBody;
+        return body;
     }
 }

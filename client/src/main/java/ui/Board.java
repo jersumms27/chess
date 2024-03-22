@@ -26,7 +26,7 @@ public class Board {
     //    drawBoard(out, board, true);
     //}
 
-    public static void drawBoard(PrintStream out, ChessBoard board, boolean inverted) {
+    public static void drawBoard(ChessBoard board, boolean inverted) { // default is white's perspective
         String[] regularRowHeader = {"a", "b", "c", "d", "e", "f", "g", "h"};
         String[] invertedRowHeader = {"h", "g", "f", "e", "d", "c", "b", "a"};
         String[] regularColHeader = {"8", "7", "6", "5", "4", "3", "2", "1"};
@@ -42,8 +42,8 @@ public class Board {
             colHeader = regularColHeader;
         }
 
-        drawHeader(out, rowHeader);
-        out.println();
+        drawHeader(rowHeader);
+        System.out.println();
         int startRow = 0;
         int endRow = NUM_SQUARES;
         int incrementRow = 1;
@@ -60,48 +60,48 @@ public class Board {
             for (int p = startCol; (p - endCol) * (p - endCol) != 0; p += incrementCol) {
                 pieces[p] = board.getPiece(new ChessPosition(r + 1, p + 1));
             }
-            drawRow(out, pieces, colHeader[r], r);
-            out.println();
+            drawRow(pieces, colHeader[r], r);
+            System.out.println();
         }
-        drawHeader(out, rowHeader);
-        out.println();
+        drawHeader(rowHeader);
+        System.out.println();
     }
 
-    public static void drawHeader(PrintStream out, String[] header) {
-        out.print(SET_BG_COLOR_LIGHT_GREY);
-        out.print(" ");
+    public static void drawHeader(String[] header) {
+        System.out.print(SET_BG_COLOR_LIGHT_GREY);
+        System.out.print(" ");
         for (int h = 0; h < NUM_SQUARES; h++) {
-            out.print(SET_TEXT_COLOR_BLACK);
-            out.print(WIDTH_SPACE + header[h] + WIDTH_SPACE);
+            System.out.print(SET_TEXT_COLOR_BLACK);
+            System.out.print(WIDTH_SPACE + header[h] + WIDTH_SPACE);
         }
     }
 
-    public static void drawRow(PrintStream out, ChessPiece[] pieces, String header, int rowNumber) {
+    public static void drawRow(ChessPiece[] pieces, String header, int rowNumber) {
         for (int c = 0; c < NUM_SQUARES + 2; c++) {
             if (c == 0 || c == NUM_SQUARES + 1) {
-                out.print(SET_TEXT_COLOR_BLACK);
-                out.print(SET_BG_COLOR_LIGHT_GREY);
-                out.print(header);
+                System.out.print(SET_TEXT_COLOR_BLACK);
+                System.out.print(SET_BG_COLOR_LIGHT_GREY);
+                System.out.print(header);
             } else {
                 if (rowNumber % 2 != c % 2) {
-                    out.print(SET_BG_COLOR_WHITE);
+                    System.out.print(SET_BG_COLOR_WHITE);
                 } else {
-                    out.print(SET_BG_COLOR_BLACK);
+                    System.out.print(SET_BG_COLOR_BLACK);
                 }
-                out.print(pieceToString(out, pieces[c - 1]));
+                System.out.print(pieceToString(pieces[c - 1]));
             }
         }
     }
 
-    private static String pieceToString(PrintStream out, ChessPiece piece) {
+    private static String pieceToString(ChessPiece piece) {
         if (piece == null) {
             return WIDTH_SPACE + " " + WIDTH_SPACE;
         }
         String str = "";
         if (piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
-            out.print(SET_TEXT_COLOR_BLUE);
+            System.out.print(SET_TEXT_COLOR_BLUE);
         } else {
-            out.print(SET_TEXT_COLOR_RED);
+            System.out.print(SET_TEXT_COLOR_RED);
         }
 
         ChessPiece.PieceType type = piece.getPieceType();

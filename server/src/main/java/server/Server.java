@@ -86,6 +86,7 @@ public class Server {
     }
 
     private Object createGame(Request request, Response response) {
+        System.out.println("sho");
         String createGameResponse = gameHandler.createGame(request.headers("authorization"), request.body());
         String message = (new Gson()).fromJson(createGameResponse, CreateGameResponse.class).message();
         if (message.isEmpty()) {

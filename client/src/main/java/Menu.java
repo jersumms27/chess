@@ -1,12 +1,13 @@
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import chess.ChessBoard;
+import ui.Board;
+
+import java.io.PrintStream;
+import java.util.*;
 
 public class Menu {
     private boolean loggedIn;
     private boolean quit;
     private String authToken;
-    private Map<String, String> authHeader;
     Scanner scanner;
     ServerFacade serverFacade;
 
@@ -14,7 +15,6 @@ public class Menu {
         loggedIn = false;
         quit = false;
         authToken = "";
-        authHeader = new HashMap<>();
         scanner = new Scanner(System.in);
         serverFacade = new ServerFacade();
 
@@ -28,6 +28,7 @@ public class Menu {
 
     public void preloginMenu() throws Exception {
         while (!quit) {
+            //System.out.println("HELP\nQUIT\nLOGIN\nREGISTER");
             String input = scanner.nextLine();
 
             if (input.equalsIgnoreCase("quit")) {
@@ -44,6 +45,7 @@ public class Menu {
 
     public void postloginMenu() throws Exception {
         while (loggedIn) {
+            //System.out.println("HELP\nLOGOUT\nCREATE\nLIST\nJOIN\nOBSERVE");
             String input = scanner.nextLine();
 
             if (input.equalsIgnoreCase("logout")) {
@@ -75,16 +77,20 @@ public class Menu {
     }
 
     private void login() throws Exception {
-        loggedIn = true;
         System.out.println("Enter username and password:");
         String input = scanner.nextLine();
         String[] arguments = input.split(" ");
-        String username = arguments[0];
-        String password = arguments[1];
+        String[] bodyKeys = {"username", "password"};
+        Map<String, String> response = new HashMap<>();
 
-        Map<String, String> response = serverFacade.performAction("http://localhost:8080/session", "POST", "{ \"username\": \"" + username + "\", \"password\": \"" + password + "\" }", null);
+        try {
+            String[] bodyValues = {arguments[0], arguments[1]};
+            response = serverFacade.communicate("session", "POST", bodyKeys, bodyValues, authToken);
+            loggedIn = true;
+        } catch (Exception ex) {
+            System.out.println("Error: could not log in");
+        }
         authToken = response.get("authToken");
-        authHeader.put("authorization", authToken);
         postloginMenu();
     }
 
@@ -92,16 +98,18 @@ public class Menu {
         System.out.println("Enter username, password, email:");
         String input = scanner.nextLine();
         String[] arguments = input.split(" ");
-        String username = arguments[0];
-        String password = arguments[1];
-        String email = arguments[2];
-
-        serverFacade.performAction("http://localhost:8080/user", "POST", "{ \"username\": \"" + username + "\", \"password\": \"" + password + "\", \"email\": " + email + "\" }", null);
-        // Login
-        Map<String, String> response = serverFacade.performAction("http://localhost:8080/session", "POST", "{ \"username\": \"" + username + "\", \"password\": \"" + password + "\" }", null);
-        authToken = response.get("authToken");
-        authHeader.put("authorization", authToken);
-        postloginMenu();
+        String[] bodyKeys = {"username", "password", "email"};
+        try {
+            String[] bodyValues = {arguments[0], arguments[1], arguments[2]};
+            serverFacade.communicate("user", "POST", bodyKeys, bodyValues, null);
+            // Login
+            loggedIn = true;
+            Map<String, String> response = serverFacade.communicate("session", "POST", Arrays.copyOfRange(bodyKeys, 0, 2), Arrays.copyOfRange(bodyValues, 0, 2), null);
+            authToken = response.get("authToken");
+            postloginMenu();
+        } catch (Exception ex) {
+            System.out.println("Error: could not register");
+        }
 
     }
 
@@ -116,17 +124,25 @@ public class Menu {
 
     private void logout() throws Exception {
         loggedIn = false;
-        serverFacade.performAction("http://localhost:8080/session", "DELETE", "{}", authHeader);
+        String[] empty = {};
+        serverFacade.communicate("session", "DELETE", empty, empty, authToken);
     }
 
     private void createGame() throws Exception {
         System.out.println("Enter game name:");
         String name = scanner.nextLine();
-        serverFacade.performAction("http://localhost:8080/game", "POST", "{ \"gameName\": \"" + name + "\" }", authHeader);
+        String[] bodyKeys = {"gameName"};
+        String[] bodyValues = {name};
+        try {
+            serverFacade.communicate("game", "POST", bodyKeys, bodyValues, authToken);
+        } catch (Exception ex) {
+            System.out.println("Error: could not create game");
+        }
     }
 
     private void listGames() throws Exception {
-        serverFacade.performAction("http://localhost:8080/game", "GET", "{}", authHeader);
+        String[] empty = {};
+        Map<String, String> response = serverFacade.communicate("game", "GET", empty, empty, authToken);
     }
 
     private void joinGame() throws Exception {
@@ -134,15 +150,35 @@ public class Menu {
         String input = scanner.nextLine();
         String[] arguments = input.split(" ");
         String color = arguments[0];
-        String id = arguments[1];
+        String[] bodyKeys = {"playerColor", "gameID"};
+        try {
+            if (!color.equalsIgnoreCase("white") && !color.equalsIgnoreCase("black")) {
+                throw new Exception();
+            }
+            String[] bodyValues = {arguments[0].toUpperCase(), arguments[1]};
+            serverFacade.communicate("game", "PUT", bodyKeys, bodyValues, authToken);
 
-        serverFacade.performAction("http://localhost:8080/game", "PUT", "{ \"playerColor\": \"" + color + "\", \"gameID\": \"" + id + "\" }", authHeader);
+            ChessBoard board = new ChessBoard();
+            board.resetBoard();
+            if (color.equalsIgnoreCase("white")) {
+                Board.drawBoard(board, true);
+            } else {
+                Board.drawBoard(board, false);
+            }
+        } catch (Exception ex) {
+            System.out.println("Error: could not join game");
+        }
     }
 
     private void observeGame() throws Exception {
         System.out.println("Enter game ID:");
         String id = scanner.nextLine();
-
-        serverFacade.performAction("http://localhost:8080/game", "PUT", "{ \"playerColor\": \"" + "\", \"gameID\": \"" + id + "\" }", authHeader);
+        String[] bodyKeys = {"playerColor", "gameID"};
+        String[] bodyValues = {null, id};
+        try {
+            serverFacade.communicate("game", "PUT", bodyKeys, bodyValues, authToken);
+        } catch (Exception ex) {
+            System.out.println("Error: could not observe game");
+        }
     }
 }
