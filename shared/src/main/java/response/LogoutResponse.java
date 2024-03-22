@@ -1,4 +1,4 @@
-package service.response;
+package response;
 
 public record LogoutResponse(String message) {
 }

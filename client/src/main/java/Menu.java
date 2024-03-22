@@ -1,4 +1,7 @@
 import chess.ChessBoard;
+import com.google.gson.Gson;
+import model.GameData;
+import response.ListGamesResponse;
 import ui.Board;
 
 import java.io.PrintStream;
@@ -85,7 +88,7 @@ public class Menu {
 
         try {
             String[] bodyValues = {arguments[0], arguments[1]};
-            response = serverFacade.communicate("session", "POST", bodyKeys, bodyValues, authToken);
+            response = (Map<String, String>) serverFacade.communicate("session", "POST", bodyKeys, bodyValues, authToken);
             loggedIn = true;
         } catch (Exception ex) {
             System.out.println("Error: could not log in");
@@ -104,7 +107,7 @@ public class Menu {
             serverFacade.communicate("user", "POST", bodyKeys, bodyValues, null);
             // Login
             loggedIn = true;
-            Map<String, String> response = serverFacade.communicate("session", "POST", Arrays.copyOfRange(bodyKeys, 0, 2), Arrays.copyOfRange(bodyValues, 0, 2), null);
+            Map<String, String> response = (Map<String, String>) serverFacade.communicate("session", "POST", Arrays.copyOfRange(bodyKeys, 0, 2), Arrays.copyOfRange(bodyValues, 0, 2), null);
             authToken = response.get("authToken");
             postloginMenu();
         } catch (Exception ex) {
@@ -142,61 +145,15 @@ public class Menu {
 
     private void listGames() throws Exception {
         String[] empty = {};
-        Map<String, String> response = serverFacade.communicate("game", "GET", empty, empty, authToken);
-        int index = 0;
-        for (Map.Entry<String, String> entry: response.entrySet()) {
-            if (index > 0) {
-                break;
-            }
-            System.out.println(parseGame(entry.toString()));
-            index ++;
+        String response = (String) serverFacade.communicate("game", "GET", empty, empty, authToken);
+        Collection<GameData> games = new Gson().fromJson(response, ListGamesResponse.class).games();
+        for (GameData game: games) {
+            String output = "";
+            output += "name: " + game.gameName() + ", ID: " + game.gameID() + ", white: " + game.whiteUsername() + ", black: " + game.blackUsername();
+            System.out.println(output);
         }
     }
 
-    private String parseGame(String entry) {
-        int startIndex = 0;
-        int endIndex = "gameID".length();
-        String output = "";
-        ArrayList<String> ids = new ArrayList<>();
-        ArrayList<String> names = new ArrayList<>();
-        String keyWord = "gameID";
-        while (endIndex < entry.length()) {
-            if (entry.substring(startIndex, endIndex).equals(keyWord)) {
-                if (keyWord.equals("gameID")) {
-                    ids.add(getGameValue(entry.substring(startIndex)));
-                    keyWord = "gameName";
-                } else {
-                    names.add(getGameValue(entry.substring(startIndex)));
-                    keyWord = "gameID";
-                }
-                startIndex = endIndex + 1;
-                endIndex = startIndex + keyWord.length();
-            } else {
-                startIndex++;
-                endIndex++;
-            }
-        }
-
-        for (int i = 0; i < names.size(); i++) {
-            output += "name: " + names.get(i) + ", ID: " + ids.get(i) + "\n";
-        }
-
-        return output;
-    }
-
-    private String getGameValue(String entry) {
-        String output = "";
-        int startIndex = 0;
-        while (entry.charAt(startIndex) != '=') {
-            startIndex ++;
-        }
-        startIndex ++;
-        int endIndex = startIndex + 1;
-        while (entry.charAt(endIndex) != ',' && entry.charAt(endIndex) != '}') {
-            endIndex ++;
-        }
-        return entry.substring(startIndex, endIndex);
-    }
 
     private void joinGame() throws Exception {
         System.out.println("Enter color and game ID:");

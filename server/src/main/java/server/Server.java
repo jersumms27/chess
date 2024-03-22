@@ -1,6 +1,6 @@
 package server;
 
-import service.response.*;
+import response.*;
 import spark.*;
 import handler.*;
 import com.google.gson.*;

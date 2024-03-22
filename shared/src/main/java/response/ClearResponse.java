@@ -1,4 +1,4 @@
-package service.response;
+package response;
 
 public record ClearResponse(String message) {
 }

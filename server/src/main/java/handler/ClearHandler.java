@@ -1,6 +1,6 @@
 package handler;
 
-import service.response.ClearResponse;
+import response.ClearResponse;
 
 public class ClearHandler implements Handler {
     public String clear() {

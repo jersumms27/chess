@@ -2,6 +2,10 @@ package serviceTests;
 
 import dataAccess.*;
 import org.junit.jupiter.api.Test;
+import response.CreateGameResponse;
+import response.JoinGameResponse;
+import response.ListGamesResponse;
+import response.RegisterResponse;
 import service.*;
 import service.request.*;
 import service.response.*;

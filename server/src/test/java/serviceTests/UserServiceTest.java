@@ -1,10 +1,12 @@
 package serviceTests;
 
 import dataAccess.*;
-import model.UserData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import response.LoginResponse;
+import response.LogoutResponse;
+import response.RegisterResponse;
 import service.*;
 import service.request.*;
 import service.response.*;

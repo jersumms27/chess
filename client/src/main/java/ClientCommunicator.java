@@ -1,5 +1,6 @@
 import com.google.gson.Gson;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -8,7 +9,7 @@ import java.net.URISyntaxException;
 import java.util.Map;
 
 public class ClientCommunicator {
-    public Map<String, String> performAction(String url, String method, String body, Map<String, String> headers) throws Exception {
+    public Object performAction(String url, String method, String body, Map<String, String> headers) throws Exception {
         HttpURLConnection http = sendRequest(url, method, body, headers);
         return receiveResponse(http);
     }
@@ -40,18 +41,27 @@ public class ClientCommunicator {
 
     }
 
-    private Map<String, String> receiveResponse(HttpURLConnection http) throws Exception {
+    private Object receiveResponse(HttpURLConnection http) throws Exception {
         int statusCode = http.getResponseCode();
         String statusMessage = http.getResponseMessage();
 
         return readResponseBody(http);
     }
 
-    private Map<String, String> readResponseBody(HttpURLConnection http) throws Exception {
+    private Object readResponseBody(HttpURLConnection http) throws Exception {
         Object responseBody = "";
         try (InputStream respBody = http.getInputStream()) {
             InputStreamReader inputStreamReader = new InputStreamReader(respBody);
-            responseBody = new Gson().fromJson(inputStreamReader, Map.class);
+            if (http.getRequestMethod().equals("GET")) {
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String str = "";
+                while ((str = bufferedReader.readLine()) != null) {
+                    responseBody += str;
+                }
+                return responseBody;
+            } else {
+                responseBody = new Gson().fromJson(inputStreamReader, Map.class);
+            }
         }
 
         return (Map<String, String>) responseBody;

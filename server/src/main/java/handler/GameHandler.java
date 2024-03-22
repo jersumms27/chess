@@ -2,9 +2,9 @@ package handler;
 
 import service.request.CreateGameRequest;
 import service.request.JoinGameRequest;
-import service.response.CreateGameResponse;
-import service.response.JoinGameResponse;
-import service.response.ListGamesResponse;
+import response.CreateGameResponse;
+import response.JoinGameResponse;
+import response.ListGamesResponse;
 
 public class GameHandler implements Handler {
     // parameter: authToken

@@ -5,8 +5,8 @@ public class ServerFacade {
     public ServerFacade() {
         communicator = new ClientCommunicator();
     }
-    public Map<String, String> communicate(String path, String method, String[] bodyKeys, String[] bodyValues, String authToken) throws Exception {
-        Map<String, String> response;
+    public Object communicate(String path, String method, String[] bodyKeys, String[] bodyValues, String authToken) throws Exception {
+        Object response;
 
         String url = makePath(path);
         String body = createJson(new ArrayList<>(Arrays.asList(bodyKeys)), new ArrayList<>(Arrays.asList(bodyValues)));

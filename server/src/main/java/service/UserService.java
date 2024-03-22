@@ -4,9 +4,9 @@ import dataAccess.*;
 import model.UserData;
 import service.request.LoginRequest;
 import service.request.RegisterRequest;
-import service.response.LoginResponse;
-import service.response.LogoutResponse;
-import service.response.RegisterResponse;
+import response.LoginResponse;
+import response.LogoutResponse;
+import response.RegisterResponse;
 
 public class UserService {
     AuthDAO authDAO;
