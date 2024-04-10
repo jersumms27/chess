@@ -1,6 +1,6 @@
 package clientTests;
 
-import communication.ClientCommunicator;
+import communication.HTTPCommunicator;
 import org.junit.jupiter.api.*;
 import server.Server;
 import communication.ServerFacade;
@@ -14,13 +14,13 @@ public class ServerFacadeTests {
 
     private static Server server;
     static ServerFacade facade;
-    static ClientCommunicator communicator;
+    static HTTPCommunicator communicator;
     static int port;
 
     @BeforeAll
     public static void init() {
         server = new Server();
-        communicator = new ClientCommunicator();
+        communicator = new HTTPCommunicator();
         port = server.run(0);
         facade = new ServerFacade(port);
         System.out.println("Started test HTTP server on " + port);

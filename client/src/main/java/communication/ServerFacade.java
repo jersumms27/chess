@@ -1,18 +1,16 @@
 package communication;
 
-import communication.ClientCommunicator;
-
 import java.util.*;
 
 public class ServerFacade {
-    ClientCommunicator communicator;
+    HTTPCommunicator communicator;
     int port = 8080;
     public ServerFacade() {
-        communicator = new ClientCommunicator();
+        communicator = new HTTPCommunicator();
     }
 
     public ServerFacade(int port) {
-        communicator = new ClientCommunicator();
+        communicator = new HTTPCommunicator();
         this.port = port;
     }
 

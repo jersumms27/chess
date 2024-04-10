@@ -1,14 +1,25 @@
 package server;
 
+//import org.eclipse.jetty.websocket.server.WebSocketHandler;
 import response.*;
 import spark.*;
 import handler.*;
 import com.google.gson.*;
+import server.webSocket.*;
 
 public class Server {
-    ClearHandler clearHandler = new ClearHandler();
-    UserHandler userHandler = new UserHandler();
-    GameHandler gameHandler = new GameHandler();
+    ClearHandler clearHandler;
+    UserHandler userHandler;
+    GameHandler gameHandler;
+    WebSocketHandler webSocketHandler;
+
+    public Server() {
+        clearHandler = new ClearHandler();
+        userHandler = new UserHandler();
+        gameHandler = new GameHandler();
+
+        webSocketHandler = new WebSocketHandler();
+    }
 
 
     public int run(int desiredPort) {
@@ -16,6 +27,7 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
+        Spark.webSocket("/connect", webSocketHandler);
         // Register your endpoints and handle exceptions here.
         Spark.delete("/db", this::clear); // clear application
         Spark.post("/user", this::register); // register
