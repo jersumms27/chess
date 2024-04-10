@@ -18,7 +18,7 @@ public class Server {
         userHandler = new UserHandler();
         gameHandler = new GameHandler();
 
-        webSocketHandler = new WebSocketHandler();
+        webSocketHandler = new WebSocketHandler(gameHandler);
     }
 
 
