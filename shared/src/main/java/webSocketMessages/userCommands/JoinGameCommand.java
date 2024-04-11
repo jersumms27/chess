@@ -6,8 +6,8 @@ public class JoinGameCommand extends UserGameCommand {
     private final int gameID;
     private final ChessGame.TeamColor playerColor;
 
-    public JoinGameCommand(String authToken, int gameID, ChessGame.TeamColor playerColor) {
-        super(authToken);
+    public JoinGameCommand(String authToken, String playerName, int gameID, ChessGame.TeamColor playerColor) {
+        super(authToken, playerName);
         this.gameID = gameID;
         this.playerColor = playerColor;
     }

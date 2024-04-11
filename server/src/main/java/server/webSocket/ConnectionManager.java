@@ -19,20 +19,42 @@ public class ConnectionManager {
         connections.remove(playerName);
     }
 
-    public void broadcast(String rootPlayer, ServerMessage message) throws IOException {
-        ArrayList<Connection> removeList = new ArrayList<>();
+    public void broadcastToEveryone(ServerMessage message) throws IOException {
+        broadcast((ArrayList) connections.values(), message);
+    }
+
+    public void broadcastExcludingRoot(String rootPlayer, ServerMessage message) throws IOException {
+        ArrayList<Connection> include = new ArrayList<>();
         for (Connection connection: connections.values()) {
+            if (!connection.playerName.equals(rootPlayer)) {
+                include.add(connection);
+            }
+        }
+
+        broadcast(include, message);
+    }
+
+    public void broadcastToRoot(String rootPlayer, ServerMessage message) throws IOException {
+        ArrayList<Connection> include = new ArrayList<>();
+        include.add(connections.get(rootPlayer));
+
+        broadcast(include, message);
+    }
+
+    private void broadcast(ArrayList<Connection> includedPlayers, ServerMessage message) throws IOException {
+        ArrayList<Connection> removeList = new ArrayList<>();
+        for (Connection connection: includedPlayers) {
             if (connection.session.isOpen()) {
-                if (!connection.playerName.equals(rootPlayer)) {
-                    connection.send(message.toString());
-                }
+                connection.send(message.toString());
             } else {
                 removeList.add(connection);
             }
         }
 
-        for (Connection connection: removeList) {
-            connections.remove(connection.playerName);
+        for (Connection connection: connections.values()) {
+            if (!includedPlayers.contains(connection) || removeList.contains(connection)) {
+                connections.remove(connection.playerName);
+            }
         }
     }
 }
