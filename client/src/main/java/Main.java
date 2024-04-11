@@ -8,11 +8,11 @@ public class Main {
     public static void main(String[] args) throws Exception {
         //var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
         //System.out.println("♕ 240 Chess Client: " + piece);
-        URI uri = new URI("http://localhost:8080/chess");
+        URI uri = new URI("http://localhost:8080");
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
         http.setRequestMethod("GET");
 
         http.connect();
-        Menu menu = new Menu();
+        Menu menu = new Menu(uri.toString());
     }
 }

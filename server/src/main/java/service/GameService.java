@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataAccess.*;
 import model.GameData;
 import service.request.CreateGameRequest;
@@ -7,6 +8,7 @@ import service.request.JoinGameRequest;
 import response.CreateGameResponse;
 import response.JoinGameResponse;
 import response.ListGamesResponse;
+import webSocketMessages.userCommands.MakeMoveCommand;
 
 public class GameService {
     AuthDAO authDAO;
@@ -21,6 +23,7 @@ public class GameService {
     // parameter: authToken
     // return: list of games
     public ListGamesResponse listGames(String authToken) {
+        System.out.println("in GameService.listGames");
         //Verify authToken
         try {
             authDAO.getAuth(authToken);
@@ -88,5 +91,19 @@ public class GameService {
         }
 
         return new JoinGameResponse(""); //[200]
+    }
+
+    public void updateGame(ChessGame newGame, int gameID, String leavingPlayer) throws DataAccessException {
+        GameData previous = gameDAO.getGame(gameID);
+        String newWhiteUsername = previous.whiteUsername();
+        String newBlackUsername = previous.blackUsername();
+        if (leavingPlayer.equals(previous.whiteUsername())) {
+            newWhiteUsername = null;
+        } else if (leavingPlayer.equals(previous.blackUsername())) {
+            newBlackUsername = null;
+        }
+        GameData update = new GameData(gameID, newWhiteUsername, newBlackUsername, previous.gameName(), newGame);
+
+        gameDAO.updateGame(update);
     }
 }

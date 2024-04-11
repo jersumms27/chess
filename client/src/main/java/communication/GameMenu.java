@@ -1,9 +1,11 @@
 package communication;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.ChessPosition;
 import ui.Board;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 public class GameMenu {
@@ -11,26 +13,35 @@ public class GameMenu {
     private boolean quit;
     private boolean observer;
     private String playerName;
-    private String playerColor;
+    private ChessGame.TeamColor playerColor;
+    private String auth;
     private Scanner scanner;
-    private ChessGame game;
+    private ChessGame currentGame;
+    private int gameID;
 
-    public GameMenu(boolean observer, String playerName, String playerColor) {
+    public GameMenu(String url, boolean observer, String auth, String playerName, ChessGame.TeamColor playerColor, int gameID) throws Exception {
         quit = false;
         this.observer = observer;
         this.playerName = playerName;
         this.playerColor = playerColor;
+        this.auth = auth;
+        this.gameID = gameID;
+        currentGame = new ChessGame();
+
         scanner = new Scanner(System.in);
+        communicator = new WebSocketCommunicator(url);
 
         if (observer) {
-
+            communicator.joinObserver(auth, playerName, gameID);
         } else {
-
+            System.out.println("attempting to join");
+            communicator.joinPlayer(auth, playerName, gameID, playerColor);
+            System.out.println("finished joining");
         }
         menu();
     }
 
-    public void menu() {
+    public void menu() throws IOException {
         boolean help = false;
         while (!quit) {
             if (!help) {
@@ -70,31 +81,52 @@ public class GameMenu {
     }
 
     public void redrawChessBoard() {
-        Board.drawBoard(game, playerColor.equals("white"), false, null);
+        Board.drawBoard(currentGame, playerColor.equals(ChessGame.TeamColor.WHITE), false, null);
     }
 
-    public void leave() {
+    public void leave() throws IOException {
         quit = true;
-        // TODO: websocket
+        communicator.leave(auth, playerName, gameID);
     }
 
     public void makeMove() {
-        //TODO: websocket
+        System.out.println("Enter start position followed by end position (row, then column):");
+        String input = scanner.nextLine();
+        String[] arguments = input.split(" ");
+        String errorString = "";
+        try {
+            errorString = "Error: invalid input";
+            int startRow = Integer.parseInt(arguments[0].substring(0, 1));
+            int startCol = Integer.parseInt(arguments[0].substring(1));
+            int endRow = Integer.parseInt(arguments[1].substring(0, 1));
+            int endCol = Integer.parseInt(arguments[1].substring(1));
+
+            ChessPosition startPos = new ChessPosition(startRow, startCol);
+            ChessPosition endPos = new ChessPosition(endRow, endCol);
+            ChessMove move = new ChessMove(startPos, endPos, null);
+
+            errorString = "Error: illegal move";
+            currentGame.makeMove(move);
+
+            communicator.makeMove(auth, playerName, gameID, move);
+        } catch (Exception ex) {
+            System.out.println(errorString);
+        }
     }
 
-    public void resign() {
-        //TODO: websocket
+    public void resign() throws IOException {
+        communicator.resign(auth, playerName, gameID);
     }
 
     public void highlightLegalMoves() {
-        System.out.println("Enter position of piece");
+        System.out.println("Enter position of piece (row, then column):");
         String input = scanner.nextLine();
         String[] arguments = input.split(" ");
         try {
             ChessPosition pos = new ChessPosition(Integer.parseInt(arguments[0]), Integer.parseInt(arguments[1]));
-            Board.drawBoard(game, playerColor.equals("white"), true, pos);
+            Board.drawBoard(currentGame, playerColor.equals(ChessGame.TeamColor.WHITE), true, pos);
         } catch (Exception ex) {
-            System.out.println("Invalid input");
+            System.out.println("Error: invalid input");
         }
     }
 }

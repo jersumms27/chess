@@ -1,6 +1,7 @@
 package communication;
 
 import chess.ChessBoard;
+import chess.ChessGame;
 import com.google.gson.Gson;
 import model.GameData;
 import response.ListGamesResponse;
@@ -12,17 +13,19 @@ public class Menu {
     private boolean loggedIn;
     private boolean quit;
     private String authToken;
+    private String playerName;
     Scanner scanner;
     ServerFacade serverFacade;
+    String url;
 
-
-
-    public Menu() throws Exception {
+    public Menu(String url) throws Exception {
         loggedIn = false;
         quit = false;
         authToken = "";
+        playerName = "";
         scanner = new Scanner(System.in);
         serverFacade = new ServerFacade();
+        this.url = url;
 
         System.out.println("Welcome to chess!");
         preloginMenu();
@@ -113,6 +116,7 @@ public class Menu {
         try {
             errorString = "Error: invalid input";
             String[] bodyValues = {arguments[0], arguments[1]};
+            playerName = arguments[0];
             errorString = "Error: could not log in";
             response = (Map<String, String>) serverFacade.communicate("session", "POST", bodyKeys, bodyValues, authToken);
             authToken = response.get("authToken");
@@ -171,8 +175,11 @@ public class Menu {
     }
 
     private void listGames() throws Exception {
+        System.out.println("entered Menu.listGames");
         String[] empty = {};
+        System.out.println("going into serverFacade");
         String response = (String) serverFacade.communicate("game", "GET", empty, empty, authToken);
+        System.out.println("out of serverFacade");
         Collection<GameData> games = new Gson().fromJson(response, ListGamesResponse.class).games();
         if (games.isEmpty()) {
             System.out.println("No games");
@@ -202,6 +209,7 @@ public class Menu {
             }
             errorString = "Error: invalid input";
             String[] bodyValues = {arguments[0].toUpperCase(), arguments[1]};
+            int gameID = Integer.parseInt(arguments[1]);
             errorString = "Error: could not join game";
             serverFacade.communicate("game", "PUT", bodyKeys, bodyValues, authToken);
 
@@ -213,7 +221,11 @@ public class Menu {
             //    Board.drawBoard(board, false);
             //}
 
-            GameMenu gameMenu = new GameMenu(false);
+            ChessGame.TeamColor playerColor = ChessGame.TeamColor.WHITE;
+            if (color.equalsIgnoreCase("black")) {
+                playerColor = ChessGame.TeamColor.BLACK;
+            }
+            GameMenu gameMenu = new GameMenu(url, false, authToken, playerName, playerColor, gameID);
 
         } catch (Exception ex) {
             System.out.println(errorString);
@@ -227,13 +239,14 @@ public class Menu {
         String[] bodyValues = {null, id};
         try {
             serverFacade.communicate("game", "PUT", bodyKeys, bodyValues, authToken);
+            int gameID = Integer.parseInt(id);
             //ChessBoard board = new ChessBoard();
             //board.resetBoard();
             //Board.drawBoard(board, true);
             //System.out.println();
             //Board.drawBoard(board, false);
 
-            GameMenu gameMenu = new GameMenu(true);
+            GameMenu gameMenu = new GameMenu(url, true, authToken, playerName, null, gameID);
         } catch (Exception ex) {
             System.out.println("Error: could not observe game");
         }

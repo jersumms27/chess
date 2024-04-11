@@ -19,14 +19,12 @@ import java.net.URISyntaxException;
 
 public class WebSocketCommunicator extends Endpoint {
     Session session;
-    NotificationHandler notificationHandler;
     Gson gson;
 
-    public WebSocketCommunicator(String url, NotificationHandler notificationHandler) {
+    public WebSocketCommunicator(String url) throws Exception {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/connect");
-            this.notificationHandler = notificationHandler;
 
             gson = new Gson();
 
@@ -38,11 +36,10 @@ public class WebSocketCommunicator extends Endpoint {
                 @Override
                 public void onMessage(String message) {
                     ServerMessage notification = gson.fromJson(message, ServerMessage.class);
-                    notificationHandler.notify(notification);
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
-            //throw new HttpResponseException(500, ex.getMessage());
+            throw new Exception(ex.getMessage());
         }
     }
 

@@ -3,7 +3,9 @@ package server.webSocket;
 import chess.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
+import dataAccess.DataAccessException;
 import handler.GameHandler;
+import handler.Handler;
 import handler.UserHandler;
 import model.GameData;
 import org.eclipse.jetty.server.Authentication;
@@ -12,6 +14,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import response.ListGamesResponse;
+import service.GameService;
 import webSocketMessages.userCommands.*;
 import webSocketMessages.serverMessages.*;
 
@@ -20,16 +23,11 @@ import java.io.IOException;
 import java.util.Collection;
 
 @WebSocket
-public class WebSocketHandler {
+public class WebSocketHandler implements Handler {
     ConnectionManager connections;
-    GameHandler gameHandler;
-    Gson gson;
 
-    public WebSocketHandler(GameHandler gameHandler) {
+    public WebSocketHandler() {
         connections = new ConnectionManager();
-        this.gameHandler = gameHandler;
-
-        gson = new Gson();
     }
 
     @OnWebSocketMessage
@@ -50,7 +48,6 @@ public class WebSocketHandler {
         ChessGame.TeamColor playerColor = command.getPlayerColor();
         String playerName = command.getPlayerName();
 
-        ListGamesResponse response = gson.fromJson(gameHandler.listGames(auth), ListGamesResponse.class);
         ChessGame game = getGameFromID(gameID, auth);
 
         connections.add(playerName, session);
@@ -84,7 +81,7 @@ public class WebSocketHandler {
         connections.broadcastExcludingRoot(playerName, notification);
     }
 
-    private void makeMove(MakeMoveCommand command) throws IOException, InvalidMoveException {
+    private void makeMove(MakeMoveCommand command) throws IOException, InvalidMoveException, DataAccessException {
         int gameID = command.getGameID();
         ChessMove move = command.getMove();
         String auth = command.getAuthString();
@@ -92,6 +89,7 @@ public class WebSocketHandler {
 
         ChessGame game = getGameFromID(gameID, auth);
         game.makeMove(move);
+        gameService.updateGame(game, gameID, "");
 
         // server sends LOAD_GAME message to all clients
         ServerMessage loadGame = new LoadGameMessage(game);
@@ -103,13 +101,13 @@ public class WebSocketHandler {
         connections.broadcastExcludingRoot(playerName, notification);
     }
 
-    private void leave(LeaveCommand command) throws IOException {
+    private void leave(LeaveCommand command) throws IOException, DataAccessException {
         int gameID = command.getGameID();
         String auth = command.getAuthString();
         String playerName = command.getPlayerName();
 
-        //TODO: update game in database
         ChessGame game = getGameFromID(gameID, auth);
+        gameService.updateGame(game, gameID, playerName);
 
         connections.remove(playerName);
 
@@ -131,7 +129,8 @@ public class WebSocketHandler {
     }
 
     private ChessGame getGameFromID(int gameID, String auth) {
-        ListGamesResponse response = gson.fromJson(gameHandler.listGames(auth), ListGamesResponse.class);
+        //ListGamesResponse response = gson.fromJson(gameService.listGames(auth), ListGamesResponse.class);
+        ListGamesResponse response = gameService.listGames(auth);
 
         Collection<GameData> games = response.games();
         for (GameData game: games) {

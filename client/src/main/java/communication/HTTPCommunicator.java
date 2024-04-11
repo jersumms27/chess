@@ -45,6 +45,8 @@ public class HTTPCommunicator {
     private Object receiveResponse(HttpURLConnection http) throws Exception {
         int statusCode = http.getResponseCode();
         String statusMessage = http.getResponseMessage();
+        System.out.println(statusCode);
+        System.out.println(statusMessage);
 
         return readResponseBody(http);
     }

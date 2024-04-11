@@ -6,6 +6,7 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 import static ui.EscapeSequences.*;
 
@@ -14,7 +15,6 @@ public class Board {
     private static final int NUM_SQUARES = 8;
     private static final int SQUARE_SIZE_IN_CHARS = 3;
     private static final String WIDTH_SPACE = "  ";
-    private static ChessBoard board;
 
 
     //public static void main(String[] args) {
@@ -30,7 +30,7 @@ public class Board {
     //}
 
     public static void drawBoard(ChessGame game, boolean inverted, boolean highlight, ChessPosition start) { // default is white's perspective
-        board = game.getBoard();
+        ChessBoard board = game.getBoard();
 
         String[] regularRowHeader = {"a", "b", "c", "d", "e", "f", "g", "h"};
         String[] invertedRowHeader = {"h", "g", "f", "e", "d", "c", "b", "a"};
@@ -100,10 +100,11 @@ public class Board {
             if (c == 0 || c == NUM_SQUARES + 1) {
                 System.out.print(SET_TEXT_COLOR_BLACK);
                 System.out.print(SET_BG_COLOR_LIGHT_GREY);
-                System.out.print(header);
             } else {
                 if (highlight && validEndPositions.contains(new ChessPosition(rowNumber, c))) {
                     System.out.print(SET_BG_COLOR_GREEN);
+                } else if (highlight && Objects.equals(start, new ChessPosition(rowNumber, c))) {
+                    System.out.println(SET_BG_COLOR_YELLOW);
                 } else if (rowNumber % 2 == c % 2) {
                     System.out.print(SET_BG_COLOR_WHITE);
                 } else {

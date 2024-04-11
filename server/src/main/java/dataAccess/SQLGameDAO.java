@@ -82,6 +82,7 @@ public class SQLGameDAO implements GameDAO {
 
     @Override
     public Collection<GameData> listGames() throws DataAccessException {
+        System.out.println("in SQLGameDAO.listGames");
         ArrayList<GameData> listOfData = new ArrayList<>();
         String statement = """
                 SELECT *
@@ -96,6 +97,7 @@ public class SQLGameDAO implements GameDAO {
                 String gameName = resultSet.getString("name");
                 String chessGameString = resultSet.getString("game");
 
+                System.out.println(chessGameString);
                 ChessGame chessGameObject = (new Gson()).fromJson(chessGameString, ChessGame.class);
                 listOfData.add(new GameData(id, whiteUsername, blackUsername, gameName, chessGameObject));
             }
