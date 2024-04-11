@@ -3,7 +3,6 @@ package server.webSocket;
 import chess.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
-import dataAccess.GameDAO;
 import handler.GameHandler;
 import handler.UserHandler;
 import model.GameData;
@@ -57,12 +56,12 @@ public class WebSocketHandler {
         connections.add(playerName, session);
 
         // server sends LOAD_GAME message back to root client
-        ServerMessage loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+        ServerMessage loadGame = new LoadGameMessage(game);
         connections.broadcastToRoot(playerName, loadGame);
 
         // server sends NOTIFICATION to all other clients informing that root client has joined
         String message = playerName + " joined game as " + playerColor.toString();
-        ServerMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        ServerMessage notification = new NotificationMessage(message);
         connections.broadcastExcludingRoot(playerName, notification);
     }
 
@@ -76,12 +75,12 @@ public class WebSocketHandler {
         connections.add(playerName, session);
 
         // server sends LOAD_GAME message back to root client
-        ServerMessage loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+        ServerMessage loadGame = new LoadGameMessage(game);
         connections.broadcastToRoot(playerName, loadGame);
 
         // server sends NOTIFICATION to all other clients informing that root client has joined
         String message = playerName + " joined game as an observer";
-        ServerMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        ServerMessage notification = new NotificationMessage(message);
         connections.broadcastExcludingRoot(playerName, notification);
     }
 
@@ -95,12 +94,12 @@ public class WebSocketHandler {
         game.makeMove(move);
 
         // server sends LOAD_GAME message to all clients
-        ServerMessage loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+        ServerMessage loadGame = new LoadGameMessage(game);
         connections.broadcastToEveryone(loadGame);
 
         // server sends NOTIFICATION to all other clients informing what move was made
         String message = playerName + " made the move " + move.toString();
-        ServerMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        ServerMessage notification = new NotificationMessage(message);
         connections.broadcastExcludingRoot(playerName, notification);
     }
 
@@ -116,7 +115,7 @@ public class WebSocketHandler {
 
         // servers sends NOTIFICATION to all other clients that root client has left
         String message = playerName + " left the game";
-        ServerMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        ServerMessage notification = new NotificationMessage(message);
         connections.broadcastToEveryone(notification);
     }
 
@@ -127,7 +126,7 @@ public class WebSocketHandler {
         //TODO: server marks game as over, update game in database
 
         String message = playerName + " resigned from the game";
-        ServerMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        ServerMessage notification = new NotificationMessage(message);
         connections.broadcastToEveryone(notification);
     }
 

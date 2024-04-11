@@ -4,6 +4,8 @@ import chess.*;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import static ui.EscapeSequences.*;
 
@@ -12,6 +14,7 @@ public class Board {
     private static final int NUM_SQUARES = 8;
     private static final int SQUARE_SIZE_IN_CHARS = 3;
     private static final String WIDTH_SPACE = "  ";
+    private static ChessBoard board;
 
 
     //public static void main(String[] args) {
@@ -26,7 +29,9 @@ public class Board {
     //    drawBoard(board, true);
     //}
 
-    public static void drawBoard(ChessBoard board, boolean inverted) { // default is white's perspective
+    public static void drawBoard(ChessGame game, boolean inverted, boolean highlight, ChessPosition start) { // default is white's perspective
+        board = game.getBoard();
+
         String[] regularRowHeader = {"a", "b", "c", "d", "e", "f", "g", "h"};
         String[] invertedRowHeader = {"h", "g", "f", "e", "d", "c", "b", "a"};
         String[] invertedColHeader = {"8", "7", "6", "5", "4", "3", "2", "1"};
@@ -64,7 +69,7 @@ public class Board {
                 pieces[c] = board.getPiece(new ChessPosition(r + 1, p + 1));
                 c ++;
             }
-            drawRow(pieces, colHeader[r], actualRow);
+            drawRow(pieces, colHeader[r], actualRow, game, highlight, start);
             actualRow ++;
             System.out.println();
         }
@@ -73,7 +78,7 @@ public class Board {
         System.out.println();
     }
 
-    public static void drawHeader(String[] header) {
+    private static void drawHeader(String[] header) {
         System.out.print(SET_BG_COLOR_LIGHT_GREY);
         System.out.print(" ");
         for (int h = 0; h < NUM_SQUARES; h++) {
@@ -84,14 +89,22 @@ public class Board {
         System.out.print(SET_BG_COLOR_DARK_GREY);
     }
 
-    public static void drawRow(ChessPiece[] pieces, String header, int rowNumber) {
+    private static void drawRow(ChessPiece[] pieces, String header, int rowNumber, ChessGame game, boolean highlight, ChessPosition start) {
+        Collection<ChessMove> validMoves = game.validMoves(start);
+        Collection<ChessPosition> validEndPositions = new ArrayList<>();
+        for (ChessMove move: validMoves) {
+            validEndPositions.add(move.getEndPosition());
+        }
+
         for (int c = 0; c < NUM_SQUARES + 2; c++) {
             if (c == 0 || c == NUM_SQUARES + 1) {
                 System.out.print(SET_TEXT_COLOR_BLACK);
                 System.out.print(SET_BG_COLOR_LIGHT_GREY);
                 System.out.print(header);
             } else {
-                if (rowNumber % 2 == c % 2) {
+                if (highlight && validEndPositions.contains(new ChessPosition(rowNumber, c))) {
+                    System.out.print(SET_BG_COLOR_GREEN);
+                } else if (rowNumber % 2 == c % 2) {
                     System.out.print(SET_BG_COLOR_WHITE);
                 } else {
                     System.out.print(SET_BG_COLOR_BLACK);

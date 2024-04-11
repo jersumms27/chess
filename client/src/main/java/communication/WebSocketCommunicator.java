@@ -1,4 +1,77 @@
 package communication;
 
-public class WebSocketCommunicator {
+import chess.ChessGame;
+import chess.ChessMove;
+import com.google.gson.Gson;
+import org.eclipse.jetty.client.HttpResponseException;
+//import org.eclipse.jetty.websocket.api.Session;
+import javax.websocket.Session;
+
+import com.google.gson.Gson;
+//import exception.ResponseException;
+import webSocketMessages.serverMessages.*;
+import webSocketMessages.userCommands.*;
+
+import javax.websocket.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+public class WebSocketCommunicator extends Endpoint {
+    Session session;
+    NotificationHandler notificationHandler;
+    Gson gson;
+
+    public WebSocketCommunicator(String url, NotificationHandler notificationHandler) {
+        try {
+            url = url.replace("http", "ws");
+            URI socketURI = new URI(url + "/connect");
+            this.notificationHandler = notificationHandler;
+
+            gson = new Gson();
+
+            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+            this.session = (Session) container.connectToServer(this, socketURI);
+
+            // set message handler
+            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+                @Override
+                public void onMessage(String message) {
+                    ServerMessage notification = gson.fromJson(message, ServerMessage.class);
+                    notificationHandler.notify(notification);
+                }
+            });
+        } catch (DeploymentException | IOException | URISyntaxException ex) {
+            //throw new HttpResponseException(500, ex.getMessage());
+        }
+    }
+
+    @Override
+    public void onOpen(javax.websocket.Session session, EndpointConfig endpointConfig) {
+    }
+
+    public void joinPlayer(String auth, String playerName, int gameID, ChessGame.TeamColor playerColor) throws IOException {
+        UserGameCommand command = new JoinGameCommand(auth, playerName, gameID, playerColor);
+        this.session.getBasicRemote().sendText(gson.toJson(command));
+    }
+
+    public void joinObserver(String auth, String playerName, int gameID) throws IOException {
+        UserGameCommand command = new JoinObserverCommand(auth, playerName, gameID);
+        this.session.getBasicRemote().sendText(gson.toJson(command));
+    }
+
+    public void makeMove(String auth, String playerName, int gameID, ChessMove move) throws IOException {
+        UserGameCommand command = new MakeMoveCommand(auth, playerName, gameID, move);
+        this.session.getBasicRemote().sendText(gson.toJson(command));
+    }
+
+    public void leave(String auth, String playerName, int gameID) throws IOException {
+        UserGameCommand command = new LeaveCommand(auth, playerName, gameID);
+        this.session.getBasicRemote().sendText(gson.toJson(command));
+    }
+
+    public void resign(String auth, String playerName, int gameID) throws IOException {
+        UserGameCommand command = new ResignCommand(auth, playerName, gameID);
+        this.session.getBasicRemote().sendText(gson.toJson(command));
+    }
 }

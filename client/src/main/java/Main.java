@@ -1,4 +1,5 @@
 import chess.*;
+import communication.Menu;
 
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -12,5 +13,6 @@ public class Main {
         http.setRequestMethod("GET");
 
         http.connect();
+        Menu menu = new Menu();
     }
 }

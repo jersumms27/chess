@@ -15,18 +15,17 @@ public class Menu {
     Scanner scanner;
     ServerFacade serverFacade;
 
+
+
     public Menu() throws Exception {
         loggedIn = false;
         quit = false;
         authToken = "";
         scanner = new Scanner(System.in);
         serverFacade = new ServerFacade();
+
         System.out.println("Welcome to chess!");
         preloginMenu();
-    }
-
-    public static void main(String[] args) throws Exception {
-        Menu menu = new Menu();
     }
 
     public void preloginMenu() throws Exception {
@@ -108,7 +107,7 @@ public class Menu {
         String input = scanner.nextLine();
         String[] arguments = input.split(" ");
         String[] bodyKeys = {"username", "password"};
-        Map<String, String> response = new HashMap<>();
+        Map<String, String> response;
         String errorString = "";
 
         try {
@@ -206,13 +205,16 @@ public class Menu {
             errorString = "Error: could not join game";
             serverFacade.communicate("game", "PUT", bodyKeys, bodyValues, authToken);
 
-            ChessBoard board = new ChessBoard();
-            board.resetBoard();
-            if (color.equalsIgnoreCase("black")) {
-                Board.drawBoard(board, true);
-            } else {
-                Board.drawBoard(board, false);
-            }
+            //ChessBoard board = new ChessBoard();
+            //board.resetBoard();
+            //if (color.equalsIgnoreCase("black")) {
+            //    Board.drawBoard(board, true);
+            //} else {
+            //    Board.drawBoard(board, false);
+            //}
+
+            GameMenu gameMenu = new GameMenu(false);
+
         } catch (Exception ex) {
             System.out.println(errorString);
         }
@@ -225,11 +227,13 @@ public class Menu {
         String[] bodyValues = {null, id};
         try {
             serverFacade.communicate("game", "PUT", bodyKeys, bodyValues, authToken);
-            ChessBoard board = new ChessBoard();
-            board.resetBoard();
-            Board.drawBoard(board, true);
-            System.out.println();
-            Board.drawBoard(board, false);
+            //ChessBoard board = new ChessBoard();
+            //board.resetBoard();
+            //Board.drawBoard(board, true);
+            //System.out.println();
+            //Board.drawBoard(board, false);
+
+            GameMenu gameMenu = new GameMenu(true);
         } catch (Exception ex) {
             System.out.println("Error: could not observe game");
         }
