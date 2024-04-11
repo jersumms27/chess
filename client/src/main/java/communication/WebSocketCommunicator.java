@@ -5,6 +5,7 @@ import chess.ChessMove;
 import com.google.gson.Gson;
 import org.eclipse.jetty.client.HttpResponseException;
 //import org.eclipse.jetty.websocket.api.Session;
+import javax.management.Notification;
 import javax.websocket.Session;
 
 import com.google.gson.Gson;
@@ -20,6 +21,7 @@ import java.net.URISyntaxException;
 public class WebSocketCommunicator extends Endpoint {
     Session session;
     Gson gson;
+    NotificationHandler notifHandler;
 
     public WebSocketCommunicator(String url) throws Exception {
         try {
@@ -27,15 +29,17 @@ public class WebSocketCommunicator extends Endpoint {
             URI socketURI = new URI(url + "/connect");
 
             gson = new Gson();
+            notifHandler = new NotificationHandler();
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-            this.session = (Session) container.connectToServer(this, socketURI);
+            this.session = container.connectToServer(this, socketURI);
 
             // set message handler
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
                     ServerMessage notification = gson.fromJson(message, ServerMessage.class);
+                    notifHandler.notify(notification);
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {

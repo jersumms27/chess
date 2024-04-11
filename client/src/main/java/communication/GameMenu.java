@@ -124,9 +124,12 @@ public class GameMenu {
     public void highlightLegalMoves() {
         System.out.println("Enter position of piece (ex. b2):");
         String input = scanner.nextLine();
-        String[] arguments = input.split(" ");
+        //String[] arguments = input.split(" ");
         try {
-            ChessPosition pos = new ChessPosition(Integer.parseInt(arguments[0]), Integer.parseInt(arguments[1]));
+            int row = Integer.parseInt(input.substring(1));
+            int col = columnConversion(input.substring(0, 1));
+
+            ChessPosition pos = new ChessPosition(row, col);
             Board.drawBoard(currentGame, playerColor.equals(ChessGame.TeamColor.WHITE), true, pos);
         } catch (Exception ex) {
             System.out.println("Error: invalid input");
@@ -161,14 +164,16 @@ public class GameMenu {
         switch (p) {
             case "q":
                 type = ChessPiece.PieceType.QUEEN;
+                break;
             case "r":
                 type = ChessPiece.PieceType.ROOK;
-            case "k":
+                break;
+            case "k", "n":
                 type = ChessPiece.PieceType.KNIGHT;
-            case "n":
-                type = ChessPiece.PieceType.KNIGHT;
+                break;
             case "b":
                 type = ChessPiece.PieceType.BISHOP;
+                break;
         }
 
         return type;

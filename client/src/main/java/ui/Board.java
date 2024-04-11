@@ -90,13 +90,10 @@ public class Board {
     private static void drawRow(ChessPiece[] pieces, String header, int rowNumber, ChessGame game, boolean highlight, ChessPosition start) {
         Collection<ChessPosition> validEndPositions = new ArrayList<>();
         if (highlight) {
-            System.out.println("beginning to draw row");
             Collection<ChessMove> validMoves = game.validMoves(start);
-            System.out.println("got valid moves");
             for (ChessMove move : validMoves) {
                 validEndPositions.add(move.getEndPosition());
             }
-            System.out.println("got valid end positions");
         }
 
         for (int c = 0; c < NUM_SQUARES + 2; c++) {
