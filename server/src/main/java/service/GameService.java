@@ -23,7 +23,6 @@ public class GameService {
     // parameter: authToken
     // return: list of games
     public ListGamesResponse listGames(String authToken) {
-        System.out.println("in GameService.listGames");
         //Verify authToken
         try {
             authDAO.getAuth(authToken);

@@ -6,18 +6,19 @@ import java.util.HashMap;
 import java.util.Objects;
 
 /**
- * For a class that can manage a chess game, making moves on a board
+ * For a class that can manage a chess game, making moves on a gameBoard
  * <p>
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
 public class ChessGame {
-    private ChessBoard board;
+    private ChessBoard gameBoard;
     private TeamColor teamTurn;
 
     public ChessGame() {
-        board = new ChessBoard();
-        board.resetBoard();
+        gameBoard = new ChessBoard();
+        gameBoard.resetBoard();
+        System.out.println(gameBoard);
 
         teamTurn = TeamColor.WHITE;
     }
@@ -62,25 +63,25 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        if (board.getPiece(startPosition) == null) {
+        if (gameBoard.getPiece(startPosition) == null) {
             return new ArrayList<>();
         }
-        ChessPiece piece = board.getPiece(startPosition);
+        ChessPiece piece = gameBoard.getPiece(startPosition);
         TeamColor color = piece.getTeamColor();
 
         //illegal if piece cannot move there
-        Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
+        Collection<ChessMove> moves = piece.pieceMoves(gameBoard, startPosition);
         Collection<ChessMove> legalMoves = new ArrayList<>();
 
         //illegal if move puts king in check
         for (ChessMove move: moves) {
-            ChessPiece captured = board.getPiece(move.getEndPosition());
-            board.movePiece(move);
+            ChessPiece captured = gameBoard.getPiece(move.getEndPosition());
+            gameBoard.movePiece(move);
             if (!isInCheck(color)) {
                 legalMoves.add(move);
             }
-            board.movePiece(move.getReverseMove());
-            board.addPiece(move.getEndPosition(), captured);
+            gameBoard.movePiece(move.getReverseMove());
+            gameBoard.addPiece(move.getEndPosition(), captured);
         }
         return legalMoves;
     }
@@ -93,7 +94,7 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPosition startPos = move.getStartPosition();
-        ChessPiece piece = board.getPiece(startPos);
+        ChessPiece piece = gameBoard.getPiece(startPos);
 
         //check if invalid move
         if (piece == null || piece.getTeamColor() != teamTurn || !validMoves(startPos).contains(move)) {
@@ -101,7 +102,7 @@ public class ChessGame {
         }
 
         //make the actual move
-        board.movePiece(move);
+        gameBoard.movePiece(move);
         changeTeamTurn();
     }
 
@@ -118,14 +119,14 @@ public class ChessGame {
         HashMap<ChessPosition, ChessPiece> enemyPieces = new HashMap<>();
 
         ChessPosition kingPos = getKingPosition(teamColor);
-        ChessPiece piece = board.getPiece(kingPos);
+        ChessPiece piece = gameBoard.getPiece(kingPos);
 
         for (int r = 1; r <= 8; r++) {
             for (int c = 1; c <= 8; c++) {
                 pos = new ChessPosition(r, c);
-                piece = board.getPiece(pos);
+                piece = gameBoard.getPiece(pos);
                 if (piece != null && piece.getTeamColor() != teamColor){
-                    for (ChessMove move: piece.pieceMoves(board, pos)) {
+                    for (ChessMove move: piece.pieceMoves(gameBoard, pos)) {
                         if (Objects.equals(move.getEndPosition(), kingPos)){
                             return true;
                         }
@@ -156,18 +157,18 @@ public class ChessGame {
     public boolean isInStalemate(TeamColor teamColor) {
         //get position of king
         ChessPosition kingPos = getKingPosition(teamColor);
-        ChessPiece piece = board.getPiece(kingPos);
+        ChessPiece piece = gameBoard.getPiece(kingPos);
 
-        for (ChessMove move: piece.pieceMoves(board, kingPos)) {
-            ChessPiece captured = board.getPiece(move.getEndPosition());
-            board.movePiece(move);
+        for (ChessMove move: piece.pieceMoves(gameBoard, kingPos)) {
+            ChessPiece captured = gameBoard.getPiece(move.getEndPosition());
+            gameBoard.movePiece(move);
             if (!isInCheck(teamColor)) {
-                board.movePiece(move.getReverseMove());
-                board.addPiece(move.getEndPosition(), captured);
+                gameBoard.movePiece(move.getReverseMove());
+                gameBoard.addPiece(move.getEndPosition(), captured);
                 return false;
             }
-            board.movePiece(move.getReverseMove());
-            board.addPiece(move.getEndPosition(), captured);
+            gameBoard.movePiece(move.getReverseMove());
+            gameBoard.addPiece(move.getEndPosition(), captured);
         }
 
         return true;
@@ -181,7 +182,7 @@ public class ChessGame {
         int col = 1;
         while (row <= 8 && col <= 8) {
             pos = new ChessPosition(row, col);
-            piece = board.getPiece(pos);
+            piece = gameBoard.getPiece(pos);
             if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
                 return pos;
             }
@@ -196,12 +197,12 @@ public class ChessGame {
     }
 
     /**
-     * Sets this game's chessboard with a given board
+     * Sets this game's chessboard with a given gameBoard
      *
-     * @param board the new board to use
+     * @param gameBoard the new gameBoard to use
      */
-    public void setBoard(ChessBoard board) {
-        this.board = board;
+    public void setGameBoard(ChessBoard gameBoard) {
+        this.gameBoard = gameBoard;
     }
 
     /**
@@ -209,7 +210,7 @@ public class ChessGame {
      *
      * @return the chessboard
      */
-    public ChessBoard getBoard() {
-        return board;
+    public ChessBoard getGameBoard() {
+        return gameBoard;
     }
 }

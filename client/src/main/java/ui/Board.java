@@ -2,8 +2,6 @@ package ui;
 
 import chess.*;
 
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -30,7 +28,7 @@ public class Board {
     //}
 
     public static void drawBoard(ChessGame game, boolean inverted, boolean highlight, ChessPosition start) { // default is white's perspective
-        ChessBoard board = game.getBoard();
+        ChessBoard board = game.getGameBoard();
 
         String[] regularRowHeader = {"a", "b", "c", "d", "e", "f", "g", "h"};
         String[] invertedRowHeader = {"h", "g", "f", "e", "d", "c", "b", "a"};
@@ -103,8 +101,8 @@ public class Board {
             } else {
                 if (highlight && validEndPositions.contains(new ChessPosition(rowNumber, c))) {
                     System.out.print(SET_BG_COLOR_GREEN);
-                } else if (highlight && Objects.equals(start, new ChessPosition(rowNumber, c))) {
-                    System.out.println(SET_BG_COLOR_YELLOW);
+                //} else if (highlight && Objects.equals(start, new ChessPosition(rowNumber, c))) {
+                //    System.out.println(SET_BG_COLOR_YELLOW);
                 } else if (rowNumber % 2 == c % 2) {
                     System.out.print(SET_BG_COLOR_WHITE);
                 } else {
@@ -114,6 +112,7 @@ public class Board {
             }
         }
         System.out.print(SET_BG_COLOR_DARK_GREY);
+        //System.out.print(SET_TEXT_COLOR_WHITE);
     }
 
     private static String pieceToString(ChessPiece piece) {
