@@ -39,9 +39,9 @@ public class WebSocketHandler {
         switch (command.getCommandType()) {
             case JOIN_PLAYER -> joinPlayer((JoinGameCommand) command, session);
             case JOIN_OBSERVER -> joinObserver((JoinObserverCommand) command, session);
-            case MAKE_MOVE -> makeMove((MakeMoveCommand) command, session);
-            case LEAVE -> leave((LeaveCommand) command, session);
-            case RESIGN -> resign((ResignCommand) command, session);
+            case MAKE_MOVE -> makeMove((MakeMoveCommand) command);
+            case LEAVE -> leave((LeaveCommand) command);
+            case RESIGN -> resign((ResignCommand) command);
         }
     }
 
@@ -52,7 +52,9 @@ public class WebSocketHandler {
         String playerName = command.getPlayerName();
 
         ListGamesResponse response = gson.fromJson(gameHandler.listGames(auth), ListGamesResponse.class);
-        ChessGame game = getGameFromID(gameID, auth, response);
+        ChessGame game = getGameFromID(gameID, auth);
+
+        connections.add(playerName, session);
 
         // server sends LOAD_GAME message back to root client
         ServerMessage loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
@@ -69,8 +71,9 @@ public class WebSocketHandler {
         String auth = command.getAuthString();
         String playerName = command.getPlayerName();
 
-        ListGamesResponse response = gson.fromJson(gameHandler.listGames(auth), ListGamesResponse.class);
-        ChessGame game = getGameFromID(gameID, command.getAuthString(), response);
+        ChessGame game = getGameFromID(gameID, auth);
+
+        connections.add(playerName, session);
 
         // server sends LOAD_GAME message back to root client
         ServerMessage loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
@@ -82,16 +85,14 @@ public class WebSocketHandler {
         connections.broadcastExcludingRoot(playerName, notification);
     }
 
-    private void makeMove(MakeMoveCommand command, Session session) throws IOException {
+    private void makeMove(MakeMoveCommand command) throws IOException, InvalidMoveException {
         int gameID = command.getGameID();
         ChessMove move = command.getMove();
         String auth = command.getAuthString();
         String playerName = command.getPlayerName();
 
-        //TODO: actually update game object and in the databse
-
-        ListGamesResponse response = gson.fromJson(gameHandler.listGames(auth), ListGamesResponse.class);
-        ChessGame game = getGameFromID(gameID, command.getAuthString(), response);
+        ChessGame game = getGameFromID(gameID, auth);
+        game.makeMove(move);
 
         // server sends LOAD_GAME message to all clients
         ServerMessage loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
@@ -103,11 +104,15 @@ public class WebSocketHandler {
         connections.broadcastExcludingRoot(playerName, notification);
     }
 
-    private void leave(LeaveCommand command, Session session) throws IOException {
+    private void leave(LeaveCommand command) throws IOException {
         int gameID = command.getGameID();
+        String auth = command.getAuthString();
         String playerName = command.getPlayerName();
 
-        //TODO: remove root client, update game in database
+        //TODO: update game in database
+        ChessGame game = getGameFromID(gameID, auth);
+
+        connections.remove(playerName);
 
         // servers sends NOTIFICATION to all other clients that root client has left
         String message = playerName + " left the game";
@@ -115,7 +120,7 @@ public class WebSocketHandler {
         connections.broadcastToEveryone(notification);
     }
 
-    private void resign(ResignCommand command, Session session) throws IOException {
+    private void resign(ResignCommand command) throws IOException {
         int gameID = command.getGameID();
         String playerName = command.getPlayerName();
 
@@ -126,7 +131,9 @@ public class WebSocketHandler {
         connections.broadcastToEveryone(notification);
     }
 
-    private ChessGame getGameFromID(int gameID, String auth, ListGamesResponse response) {
+    private ChessGame getGameFromID(int gameID, String auth) {
+        ListGamesResponse response = gson.fromJson(gameHandler.listGames(auth), ListGamesResponse.class);
+
         Collection<GameData> games = response.games();
         for (GameData game: games) {
             if (game.gameID() == gameID) {
