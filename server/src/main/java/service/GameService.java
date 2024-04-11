@@ -56,14 +56,14 @@ public class GameService {
         try {
             gameData = gameDAO.getGame(Integer.parseInt(request.gameID()));
         } catch (DataAccessException ex) {
-            return new JoinGameResponse("Error: bad request"); //[400]
+            return new JoinGameResponse(null, "Error: bad request"); //[400]
         }
         //Check if color is taken
         if (request.playerColor() != null) {
             try {
                 gameDAO.verifyColor(Integer.parseInt(request.gameID()), request.playerColor());
             } catch (DataAccessException ex2) {
-                return new JoinGameResponse("Error: already taken"); //[403]
+                return new JoinGameResponse(null,"Error: already taken"); //[403]
             }
 
             GameData update;
@@ -74,22 +74,22 @@ public class GameService {
                     update = new GameData(Integer.parseInt(request.gameID()), gameData.whiteUsername(), authDAO.getUser(authToken), gameData.gameName(), gameData.game());
                 }
             } catch (DataAccessException ex3) {
-                return new JoinGameResponse("Error: unauthorized"); //[401]
+                return new JoinGameResponse(null, "Error: unauthorized"); //[401]
             }
             try {
                 gameDAO.updateGame(update);
             } catch (DataAccessException ex4) {
-                return new JoinGameResponse("Error: bad request"); //[400]
+                return new JoinGameResponse(null,"Error: bad request"); //[400]
             }
         } else {
             try {
                 authDAO.getAuth(authToken);
             } catch (DataAccessException ex5) {
-                return new JoinGameResponse("Error: unauthorized"); //[401]
+                return new JoinGameResponse(null,"Error: unauthorized"); //[401]
             }
         }
 
-        return new JoinGameResponse(""); //[200]
+        return new JoinGameResponse(gameData.game(), ""); //[200]
     }
 
     public void updateGame(ChessGame newGame, int gameID, String leavingPlayer) throws DataAccessException {

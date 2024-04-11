@@ -2,6 +2,7 @@ package communication;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import ui.Board;
 
@@ -19,14 +20,14 @@ public class GameMenu {
     private ChessGame currentGame;
     private int gameID;
 
-    public GameMenu(String url, boolean observer, String auth, String playerName, ChessGame.TeamColor playerColor, int gameID) throws Exception {
+    public GameMenu(String url, boolean observer, String auth, String playerName, ChessGame.TeamColor playerColor, int gameID, ChessGame game) throws Exception {
         quit = false;
         this.observer = observer;
         this.playerName = playerName;
         this.playerColor = playerColor;
         this.auth = auth;
         this.gameID = gameID;
-        currentGame = new ChessGame();
+        currentGame = game;
 
         scanner = new Scanner(System.in);
         communicator = new WebSocketCommunicator(url);
@@ -34,9 +35,7 @@ public class GameMenu {
         if (observer) {
             communicator.joinObserver(auth, playerName, gameID);
         } else {
-            System.out.println("attempting to join");
             communicator.joinPlayer(auth, playerName, gameID, playerColor);
-            System.out.println("finished joining");
         }
         menu();
     }
@@ -90,20 +89,24 @@ public class GameMenu {
     }
 
     public void makeMove() {
-        System.out.println("Enter start position followed by end position (row, then column):");
+        System.out.println("Enter start position followed by end position, followed by promotion piece if applicable (ex. a7 a8 q):");
         String input = scanner.nextLine();
         String[] arguments = input.split(" ");
         String errorString = "";
         try {
             errorString = "Error: invalid input";
-            int startRow = Integer.parseInt(arguments[0].substring(0, 1));
-            int startCol = Integer.parseInt(arguments[0].substring(1));
-            int endRow = Integer.parseInt(arguments[1].substring(0, 1));
-            int endCol = Integer.parseInt(arguments[1].substring(1));
+            int startCol = columnConversion(arguments[0].substring(0, 1));
+            int startRow = Integer.parseInt(arguments[0].substring(1));
+            int endCol = columnConversion(arguments[1].substring(0, 1));
+            int endRow = Integer.parseInt(arguments[1].substring(1));
+            ChessPiece.PieceType promPiece = null;
+            if (arguments.length == 3) {
+                promPiece = pieceConversion(arguments[2]);
+            }
 
             ChessPosition startPos = new ChessPosition(startRow, startCol);
             ChessPosition endPos = new ChessPosition(endRow, endCol);
-            ChessMove move = new ChessMove(startPos, endPos, null);
+            ChessMove move = new ChessMove(startPos, endPos, promPiece);
 
             errorString = "Error: illegal move";
             currentGame.makeMove(move);
@@ -119,7 +122,7 @@ public class GameMenu {
     }
 
     public void highlightLegalMoves() {
-        System.out.println("Enter position of piece (row, then column):");
+        System.out.println("Enter position of piece (ex. b2):");
         String input = scanner.nextLine();
         String[] arguments = input.split(" ");
         try {
@@ -128,5 +131,46 @@ public class GameMenu {
         } catch (Exception ex) {
             System.out.println("Error: invalid input");
         }
+    }
+
+    private int columnConversion(String rowLetter) {
+        switch (rowLetter) {
+            case "a":
+                return 1;
+            case "b":
+                return 2;
+            case "c":
+                return 3;
+            case "d":
+                return 4;
+            case "e":
+                return 5;
+            case"f":
+                return 6;
+            case "g":
+                return 7;
+            case"h":
+                return 8;
+        }
+
+        return 0;
+    }
+
+    private ChessPiece.PieceType pieceConversion(String p) {
+        ChessPiece.PieceType type = null;
+        switch (p) {
+            case "q":
+                type = ChessPiece.PieceType.QUEEN;
+            case "r":
+                type = ChessPiece.PieceType.ROOK;
+            case "k":
+                type = ChessPiece.PieceType.KNIGHT;
+            case "n":
+                type = ChessPiece.PieceType.KNIGHT;
+            case "b":
+                type = ChessPiece.PieceType.BISHOP;
+        }
+
+        return type;
     }
 }

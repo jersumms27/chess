@@ -1,4 +1,6 @@
 package response;
 
-public record JoinGameResponse(String message) {
+import chess.ChessGame;
+
+public record JoinGameResponse(ChessGame game, String message) {
 }

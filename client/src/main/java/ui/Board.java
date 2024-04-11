@@ -88,16 +88,22 @@ public class Board {
     }
 
     private static void drawRow(ChessPiece[] pieces, String header, int rowNumber, ChessGame game, boolean highlight, ChessPosition start) {
-        Collection<ChessMove> validMoves = game.validMoves(start);
         Collection<ChessPosition> validEndPositions = new ArrayList<>();
-        for (ChessMove move: validMoves) {
-            validEndPositions.add(move.getEndPosition());
+        if (highlight) {
+            System.out.println("beginning to draw row");
+            Collection<ChessMove> validMoves = game.validMoves(start);
+            System.out.println("got valid moves");
+            for (ChessMove move : validMoves) {
+                validEndPositions.add(move.getEndPosition());
+            }
+            System.out.println("got valid end positions");
         }
 
         for (int c = 0; c < NUM_SQUARES + 2; c++) {
             if (c == 0 || c == NUM_SQUARES + 1) {
                 System.out.print(SET_TEXT_COLOR_BLACK);
                 System.out.print(SET_BG_COLOR_LIGHT_GREY);
+                System.out.print(rowNumber);
             } else {
                 if (highlight && validEndPositions.contains(new ChessPosition(rowNumber, c))) {
                     System.out.print(SET_BG_COLOR_GREEN);

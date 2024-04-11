@@ -36,7 +36,7 @@ public class SQLGameDAO implements GameDAO {
     @Override
     public GameData createGame(String name) throws DataAccessException {
         ChessGame newChessGame = new ChessGame();
-        GameData data = new GameData(id++, null, null, name, new ChessGame());
+        GameData data = new GameData(id++, null, null, name, newChessGame);
         String chessGameString = (new Gson()).toJson(newChessGame);
 
         String statement = """

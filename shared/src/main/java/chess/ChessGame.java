@@ -1,5 +1,7 @@
 package chess;
 
+import com.google.gson.internal.LinkedTreeMap;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,7 +20,7 @@ public class ChessGame {
     public ChessGame() {
         gameBoard = new ChessBoard();
         gameBoard.resetBoard();
-        System.out.println(gameBoard);
+        //System.out.println(gameBoard);
 
         teamTurn = TeamColor.WHITE;
     }
@@ -63,11 +65,14 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        System.out.println("in ChessGame.validMoves");
         if (gameBoard.getPiece(startPosition) == null) {
             return new ArrayList<>();
         }
         ChessPiece piece = gameBoard.getPiece(startPosition);
+        System.out.println("getting team color");
         TeamColor color = piece.getTeamColor();
+        System.out.println("got team color");
 
         //illegal if piece cannot move there
         Collection<ChessMove> moves = piece.pieceMoves(gameBoard, startPosition);

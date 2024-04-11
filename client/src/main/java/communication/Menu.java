@@ -3,7 +3,9 @@ package communication;
 import chess.ChessBoard;
 import chess.ChessGame;
 import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
 import model.GameData;
+import response.JoinGameResponse;
 import response.ListGamesResponse;
 import ui.Board;
 
@@ -175,11 +177,8 @@ public class Menu {
     }
 
     private void listGames() throws Exception {
-        System.out.println("entered Menu.listGames");
         String[] empty = {};
-        System.out.println("going into serverFacade");
         String response = (String) serverFacade.communicate("game", "GET", empty, empty, authToken);
-        System.out.println("out of serverFacade");
         Collection<GameData> games = new Gson().fromJson(response, ListGamesResponse.class).games();
         if (games.isEmpty()) {
             System.out.println("No games");
@@ -211,7 +210,11 @@ public class Menu {
             String[] bodyValues = {arguments[0].toUpperCase(), arguments[1]};
             int gameID = Integer.parseInt(arguments[1]);
             errorString = "Error: could not join game";
-            serverFacade.communicate("game", "PUT", bodyKeys, bodyValues, authToken);
+
+            Map<String, Object> response = (LinkedTreeMap<String, Object>) serverFacade.communicate("game", "PUT", bodyKeys, bodyValues, authToken);
+            Gson gson = new Gson();
+            String gameJson = gson.toJson(response.get("game"));
+            ChessGame game = gson.fromJson(gameJson, ChessGame.class);
 
             //ChessBoard board = new ChessBoard();
             //board.resetBoard();
@@ -225,7 +228,7 @@ public class Menu {
             if (color.equalsIgnoreCase("black")) {
                 playerColor = ChessGame.TeamColor.BLACK;
             }
-            GameMenu gameMenu = new GameMenu(url, false, authToken, playerName, playerColor, gameID);
+            GameMenu gameMenu = new GameMenu(url, false, authToken, playerName, playerColor, gameID, game);
 
         } catch (Exception ex) {
             System.out.println(errorString);
@@ -238,7 +241,10 @@ public class Menu {
         String[] bodyKeys = {"playerColor", "gameID"};
         String[] bodyValues = {null, id};
         try {
-            serverFacade.communicate("game", "PUT", bodyKeys, bodyValues, authToken);
+            Map<String, Object> response = (LinkedTreeMap<String, Object>) serverFacade.communicate("game", "PUT", bodyKeys, bodyValues, authToken);
+            Gson gson = new Gson();
+            String gameJson = gson.toJson(response.get("game"));
+            ChessGame game = gson.fromJson(gameJson, ChessGame.class);
             int gameID = Integer.parseInt(id);
             //ChessBoard board = new ChessBoard();
             //board.resetBoard();
@@ -246,7 +252,7 @@ public class Menu {
             //System.out.println();
             //Board.drawBoard(board, false);
 
-            GameMenu gameMenu = new GameMenu(url, true, authToken, playerName, null, gameID);
+            GameMenu gameMenu = new GameMenu(url, true, authToken, playerName, null, gameID, game);
         } catch (Exception ex) {
             System.out.println("Error: could not observe game");
         }
