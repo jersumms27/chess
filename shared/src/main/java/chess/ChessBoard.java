@@ -23,7 +23,7 @@ public class ChessBoard {
         //    }
         //}
 
-        board = new ChessPiece[10][10];
+        board = new ChessPiece[8][8];
 
     }
 
@@ -35,7 +35,11 @@ public class ChessBoard {
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
         //board.put(position, piece);
-        board[position.getRow()][position.getColumn()] = piece;
+        int row = position.getRow() - 1;
+        int col = position.getColumn() - 1;
+
+        //board[position.getRow()][position.getColumn()] = piece;
+        board[row][col] = piece;
     }
 
     /**
@@ -47,7 +51,10 @@ public class ChessBoard {
      */
     public ChessPiece getPiece(ChessPosition position) {
         //return board.get(position);
-        return board[position.getRow()][position.getColumn()];
+        int row = position.getRow() - 1;
+        int col = position.getColumn() - 1;
+
+        return board[row][col];
     }
 
     public void movePiece(ChessMove move) {
