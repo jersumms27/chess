@@ -34,8 +34,13 @@ public class GameMenu {
 
         if (observer) {
             communicator.joinObserver(auth, playerName, gameID);
+            currentGame = communicator.getGame();
         } else {
+            System.out.println("going into communicator");
             communicator.joinPlayer(auth, playerName, gameID, playerColor);
+            System.out.println("out of communicator");
+            currentGame = communicator.getGame();
+            System.out.println("currentGame: " + currentGame);
         }
         menu();
     }
@@ -50,7 +55,7 @@ public class GameMenu {
             String input = scanner.nextLine();
             input = input.toLowerCase();
 
-            if (input.contains("redraw") || input.contains("chess") || input.contains("board")) {
+            if (input.contains("draw") || input.contains("chess") || input.contains("board")) {
                 redrawChessBoard();
             } else if (input.equals("leave")) {
                 leave();
@@ -74,9 +79,9 @@ public class GameMenu {
         System.out.println("HELP - displays information about options");
         System.out.println("REDRAW CHESS BOARD - redraws chess board");
         System.out.println("LEAVE - removes you from the game, takes you back to previous menu");
-        System.out.println("MAKE MOVE - allows you to enter which move to make");
+        System.out.println("MAKE MOVE - allows you to enter which move to make\n(ex. a7 a8 q):");
         System.out.println("RESIGN - you forfeit the game, causing the game to be over");
-        System.out.println("HIGHLIGHT LEGAL MOVES - enter a piece to see its possible moves");
+        System.out.println("HIGHLIGHT LEGAL MOVES - enter a piece to see its possible moves\n(ex. b2):");
     }
 
     public void redrawChessBoard() {
@@ -85,11 +90,12 @@ public class GameMenu {
 
     public void leave() throws IOException {
         quit = true;
+        //currentGame = communicator.leave(auth, playerName, gameID);
         communicator.leave(auth, playerName, gameID);
     }
 
     public void makeMove() {
-        System.out.println("Enter start position followed by end position, followed by promotion piece if applicable (ex. a7 a8 q):");
+        System.out.println("Enter start position followed by end position, followed by promotion piece if applicable:");
         String input = scanner.nextLine();
         String[] arguments = input.split(" ");
         String errorString = "";
@@ -109,26 +115,27 @@ public class GameMenu {
             ChessMove move = new ChessMove(startPos, endPos, promPiece);
 
             errorString = "Error: illegal move";
-            currentGame.makeMove(move);
+            //currentGame.makeMove(move);
 
-            communicator.makeMove(auth, playerName, gameID, move);
+            currentGame = communicator.makeMove(auth, playerName, gameID, move);
+            redrawChessBoard();
         } catch (Exception ex) {
             System.out.println(errorString);
         }
     }
 
     public void resign() throws IOException {
-        communicator.resign(auth, playerName, gameID);
+        currentGame = communicator.resign(auth, playerName, gameID);
     }
 
     public void highlightLegalMoves() {
-        System.out.println("Enter position of piece (ex. b2):");
+        System.out.println("Enter position of piece:");
         String input = scanner.nextLine();
         //String[] arguments = input.split(" ");
         try {
             int row = Integer.parseInt(input.substring(1));
             int col = columnConversion(input.substring(0, 1));
-            System.out.println("piece is at: " + row + ", " + col);
+            //System.out.println("piece is at: " + row + ", " + col);
 
             ChessPosition pos = new ChessPosition(row, col);
             Board.drawBoard(currentGame, playerColor.equals(ChessGame.TeamColor.BLACK), true, pos);

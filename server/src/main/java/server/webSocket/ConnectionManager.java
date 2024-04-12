@@ -12,38 +12,41 @@ public class ConnectionManager {
     public final ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
     Gson gson = new Gson();
 
-    public void add(String playerName, Session session) {
-        Connection connection = new Connection(playerName, session);
+    public void add(String playerName, Session session, int gameID) {
+        Connection connection = new Connection(playerName, session, gameID);
         connections.put(playerName, connection);
-        System.out.println("added, so connections is now: " + connections);
     }
 
     public void remove(String playerName) {
         connections.remove(playerName);
-        System.out.println("remove, so connections is now: " + connections);
     }
 
-    public void broadcastToEveryone(ServerMessage message) throws IOException {
+    public void broadcastToEveryone(String rootPlayer, ServerMessage message) throws IOException {
         //broadcast(new ArrayList<>(connections.values()), message);
-        ArrayList<Connection> include = new ArrayList<>(connections.values());
+        ArrayList<Connection> include = new ArrayList<>();
+        int gameID = connections.get(rootPlayer).gameID;
+        for (Connection con: connections.values()) {
+            if (con.gameID == gameID) {
+                include.add(con);
+            }
+        }
+
         broadcast(include, message);
     }
 
     public void broadcastExcludingRoot(String rootPlayer, ServerMessage message) throws IOException {
-        System.out.println("broadcastExcludingRoot");
         ArrayList<Connection> include = new ArrayList<>();
+        int gameID = connections.get(rootPlayer).gameID;
         //for (Connection connection: connections.values()) {
         //    if (!connection.playerName.equals(rootPlayer)) {
         //        include.add(connection);
         //    }
         //}
-        System.out.println(connections);
         for (String playerName: connections.keySet()) {
-            if (!playerName.equals(rootPlayer)) {
+            if (!playerName.equals(rootPlayer) && connections.get(playerName).gameID == gameID) {
                 include.add(connections.get(playerName));
             }
         }
-        System.out.println(include);
 
         broadcast(include, message);
     }
@@ -63,20 +66,16 @@ public class ConnectionManager {
         ArrayList<Connection> removeList = new ArrayList<>();
         for (Connection connection: includedPlayers) {
             if (connection.session.isOpen()) {
-                System.out.println("sending " + message + " to " + connection.playerName);
                 connection.send(gson.toJson(message));
             } else {
                 removeList.add(connection);
             }
         }
-        System.out.println("after broadcast, connections: " + connections);
 
         //for (Connection connection: connections.values()) {
         //    if (!includedPlayers.contains(connection) || removeList.contains(connection)) {
         //        connections.remove(connection.playerName);
         //    }
         //}
-
-        System.out.println("after loop thing, connections: " + connections);
     }
 }

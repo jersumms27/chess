@@ -22,12 +22,12 @@ import javax.swing.*;
 import java.io.IOException;
 import java.util.Collection;
 
+// SERVER sends messages and receives commands from CLIENT
 @WebSocket
 public class WebSocketHandler implements Handler {
     ConnectionManager connections;
 
     public WebSocketHandler() {
-        System.out.println("CREATING NEW CONNECTION MANAGER");
         connections = new ConnectionManager();
     }
 
@@ -68,11 +68,10 @@ public class WebSocketHandler implements Handler {
         String auth = command.getAuthString();
         ChessGame.TeamColor playerColor = command.getPlayerColor();
         String playerName = command.getPlayerName();
-        System.out.println("name of joined player: " + playerName);
 
         ChessGame game = getGameFromID(gameID, auth);
 
-        connections.add(playerName, session);
+        connections.add(playerName, session, gameID);
 
         // server sends LOAD_GAME message back to root client
         ServerMessage loadGame = new LoadGameMessage(game);
@@ -80,7 +79,6 @@ public class WebSocketHandler implements Handler {
 
         // server sends NOTIFICATION to all other clients informing that root client has joined
         String message = playerName + " joined game as " + playerColor.toString();
-        System.out.println(message);
         ServerMessage notification = new NotificationMessage(message);
         connections.broadcastExcludingRoot(playerName, notification);
     }
@@ -89,18 +87,16 @@ public class WebSocketHandler implements Handler {
         int gameID = command.getGameID();
         String auth = command.getAuthString();
         String playerName = command.getPlayerName();
-        System.out.println("name of observer: " + playerName);
 
         ChessGame game = getGameFromID(gameID, auth);
 
-        connections.add(playerName, session);
+        connections.add(playerName, session, gameID);
 
         // server sends LOAD_GAME message back to root client
         ServerMessage loadGame = new LoadGameMessage(game);
         connections.broadcastToRoot(playerName, loadGame);
 
         // server sends NOTIFICATION to all other clients informing that root client has joined
-        System.out.println("preparing to broadcast notification");
         String message = playerName + " joined game as an observer";
         ServerMessage notification = new NotificationMessage(message);
         connections.broadcastExcludingRoot(playerName, notification);
@@ -118,7 +114,7 @@ public class WebSocketHandler implements Handler {
 
         // server sends LOAD_GAME message to all clients
         ServerMessage loadGame = new LoadGameMessage(game);
-        connections.broadcastToEveryone(loadGame);
+        connections.broadcastToEveryone(playerName, loadGame);
 
         // server sends NOTIFICATION to all other clients informing what move was made
         String message = playerName + " made the move " + move.toString();
@@ -139,7 +135,7 @@ public class WebSocketHandler implements Handler {
         // servers sends NOTIFICATION to all other clients that root client has left
         String message = playerName + " left the game";
         ServerMessage notification = new NotificationMessage(message);
-        connections.broadcastToEveryone(notification);
+        connections.broadcastToEveryone(playerName, notification);
     }
 
     private void resign(ResignCommand command) throws IOException {
@@ -150,7 +146,7 @@ public class WebSocketHandler implements Handler {
 
         String message = playerName + " resigned from the game";
         ServerMessage notification = new NotificationMessage(message);
-        connections.broadcastToEveryone(notification);
+        connections.broadcastToEveryone(playerName, notification);
     }
 
     private ChessGame getGameFromID(int gameID, String auth) {

@@ -18,12 +18,18 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+// CLIENT sends commands to SERVER
 public class WebSocketCommunicator extends Endpoint {
     Session session;
     Gson gson;
     NotificationHandler notifHandler;
+    ChessGame newGame;
+    private boolean gameUpdated;
+    private final Object lock;
 
     public WebSocketCommunicator(String url) throws Exception {
+        newGame = null;
+        lock = new Object();
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/connect");
@@ -40,7 +46,15 @@ public class WebSocketCommunicator extends Endpoint {
                 @Override
                 public void onMessage(String message) {
                     //ServerMessage notification = gson.fromJson(message, ServerMessage.class);
-                    notifHandler.notify(message);
+                    ChessGame potentialNewGame = notifHandler.notify(message);
+                    if (potentialNewGame != null) {
+                        newGame = potentialNewGame;
+                    }
+                    synchronized (lock) {
+                        gameUpdated = true;
+                        lock.notifyAll();
+                    }
+
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
@@ -52,28 +66,49 @@ public class WebSocketCommunicator extends Endpoint {
     public void onOpen(javax.websocket.Session session, EndpointConfig endpointConfig) {
     }
 
-    public void joinPlayer(String auth, String playerName, int gameID, ChessGame.TeamColor playerColor) throws IOException {
+    public ChessGame joinPlayer(String auth, String playerName, int gameID, ChessGame.TeamColor playerColor) throws IOException {
         JoinGameCommand command = new JoinGameCommand(auth, playerName, gameID, playerColor);
         this.session.getBasicRemote().sendText(gson.toJson(command));
+
+        return newGame;
     }
 
-    public void joinObserver(String auth, String playerName, int gameID) throws IOException {
+    public ChessGame joinObserver(String auth, String playerName, int gameID) throws IOException {
         JoinObserverCommand command = new JoinObserverCommand(auth, playerName, gameID);
         this.session.getBasicRemote().sendText(gson.toJson(command));
+
+        return newGame;
     }
 
-    public void makeMove(String auth, String playerName, int gameID, ChessMove move) throws IOException {
+    public ChessGame makeMove(String auth, String playerName, int gameID, ChessMove move) throws IOException {
         MakeMoveCommand command = new MakeMoveCommand(auth, playerName, gameID, move);
         this.session.getBasicRemote().sendText(gson.toJson(command));
+
+        return newGame;
     }
 
-    public void leave(String auth, String playerName, int gameID) throws IOException {
+    public ChessGame leave(String auth, String playerName, int gameID) throws IOException {
         LeaveCommand command = new LeaveCommand(auth, playerName, gameID);
         this.session.getBasicRemote().sendText(gson.toJson(command));
+
+        return newGame;
     }
 
-    public void resign(String auth, String playerName, int gameID) throws IOException {
+    public ChessGame resign(String auth, String playerName, int gameID) throws IOException {
         ResignCommand command = new ResignCommand(auth, playerName, gameID);
         this.session.getBasicRemote().sendText(gson.toJson(command));
+
+        return newGame;
+    }
+
+    public ChessGame getGame() throws InterruptedException {
+        synchronized (lock) {
+            while (!gameUpdated) {
+                lock.wait();
+            }
+        }
+        gameUpdated = false;
+
+        return newGame;
     }
 }
