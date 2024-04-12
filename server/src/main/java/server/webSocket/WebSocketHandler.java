@@ -32,17 +32,39 @@ public class WebSocketHandler implements Handler {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {
-        UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
-        switch (command.getCommandType()) {
-            case JOIN_PLAYER -> joinPlayer((JoinGameCommand) command, session);
-            case JOIN_OBSERVER -> joinObserver((JoinObserverCommand) command, session);
-            case MAKE_MOVE -> makeMove((MakeMoveCommand) command);
-            case LEAVE -> leave((LeaveCommand) command);
-            case RESIGN -> resign((ResignCommand) command);
+        Gson gson = new Gson();
+        UserGameCommand command = gson.fromJson(message, UserGameCommand.class);
+        UserGameCommand.CommandType type = command.getCommandType();
+
+        if (type.equals(UserGameCommand.CommandType.JOIN_PLAYER)) {
+            JoinGameCommand joinGameCommand = gson.fromJson(message, JoinGameCommand.class);
+            joinPlayer(joinGameCommand, session);
+        } else if (type.equals(UserGameCommand.CommandType.JOIN_OBSERVER)) {
+            JoinObserverCommand joinObserverCommand = gson.fromJson(message, JoinObserverCommand.class);
+            joinObserver(joinObserverCommand, session);
+        } else if (type.equals(UserGameCommand.CommandType.MAKE_MOVE)) {
+            MakeMoveCommand makeMoveCommand = gson.fromJson(message, MakeMoveCommand.class);
+            makeMove(makeMoveCommand);
+        } else if (type.equals(UserGameCommand.CommandType.LEAVE)) {
+            LeaveCommand leaveCommand = gson.fromJson(message, LeaveCommand.class);
+            leave(leaveCommand);
+        } else if (type.equals(UserGameCommand.CommandType.RESIGN)) {
+            ResignCommand resignCommand = gson.fromJson(message, ResignCommand.class);
+            resign(resignCommand);
         }
+        System.out.println("bruh");
+
+        //switch (command.getCommandType()) {
+        //    case JOIN_PLAYER -> joinPlayer(command, session);
+        //    case JOIN_OBSERVER -> joinObserver((JoinObserverCommand) command, session);
+        //    case MAKE_MOVE -> makeMove((MakeMoveCommand) command);
+        //    case LEAVE -> leave((LeaveCommand) command);
+        //    case RESIGN -> resign((ResignCommand) command);
+        //}
     }
 
     private void joinPlayer(JoinGameCommand command, Session session) throws IOException {
+        System.out.println("inside WebSocketHandler.joinPlayer");
         int gameID = command.getGameID();
         String auth = command.getAuthString();
         ChessGame.TeamColor playerColor = command.getPlayerColor();
@@ -63,6 +85,7 @@ public class WebSocketHandler implements Handler {
     }
 
     private void joinObserver(JoinObserverCommand command, Session session) throws IOException {
+        System.out.println("inside WebSocketHandler.joinObserver");
         int gameID = command.getGameID();
         String auth = command.getAuthString();
         String playerName = command.getPlayerName();
@@ -82,6 +105,7 @@ public class WebSocketHandler implements Handler {
     }
 
     private void makeMove(MakeMoveCommand command) throws IOException, InvalidMoveException, DataAccessException {
+        System.out.println("inside WebSocketHandler.makeMove");
         int gameID = command.getGameID();
         ChessMove move = command.getMove();
         String auth = command.getAuthString();
@@ -102,6 +126,7 @@ public class WebSocketHandler implements Handler {
     }
 
     private void leave(LeaveCommand command) throws IOException, DataAccessException {
+        System.out.println("inside WebSocketHandler.leave");
         int gameID = command.getGameID();
         String auth = command.getAuthString();
         String playerName = command.getPlayerName();
@@ -118,6 +143,7 @@ public class WebSocketHandler implements Handler {
     }
 
     private void resign(ResignCommand command) throws IOException {
+        System.out.println("inside WebSocketHandler.resign");
         int gameID = command.getGameID();
         String playerName = command.getPlayerName();
 
@@ -135,6 +161,7 @@ public class WebSocketHandler implements Handler {
         Collection<GameData> games = response.games();
         for (GameData game: games) {
             if (game.gameID() == gameID) {
+                System.out.println("returning game: " + game.game());
                 return game.game();
             }
         }

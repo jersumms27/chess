@@ -20,7 +20,7 @@ public class ConnectionManager {
     }
 
     public void broadcastToEveryone(ServerMessage message) throws IOException {
-        broadcast((ArrayList) connections.values(), message);
+        broadcast(new ArrayList<>(connections.values()), message);
     }
 
     public void broadcastExcludingRoot(String rootPlayer, ServerMessage message) throws IOException {

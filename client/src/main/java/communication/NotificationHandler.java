@@ -12,16 +12,16 @@ public class NotificationHandler {
 
     void loadGame(LoadGameMessage message) {
         System.out.println(message.getGame());
-        System.exit(0);
+        //System.exit(0);
     }
 
     void notification(NotificationMessage message) {
         System.out.println(message.getMessage());
-        System.exit(0);
+        //System.exit(0);
     }
 
     void error(ErrorMessage message) {
         System.out.println(message.getErrorMessage());
-        System.exit(0);
+        //System.exit(0);
     }
 }
