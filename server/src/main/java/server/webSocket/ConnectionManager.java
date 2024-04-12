@@ -15,31 +15,46 @@ public class ConnectionManager {
     public void add(String playerName, Session session) {
         Connection connection = new Connection(playerName, session);
         connections.put(playerName, connection);
+        System.out.println("added, so connections is now: " + connections);
     }
 
     public void remove(String playerName) {
         connections.remove(playerName);
+        System.out.println("remove, so connections is now: " + connections);
     }
 
     public void broadcastToEveryone(ServerMessage message) throws IOException {
-        broadcast(new ArrayList<>(connections.values()), message);
+        //broadcast(new ArrayList<>(connections.values()), message);
+        ArrayList<Connection> include = new ArrayList<>(connections.values());
+        broadcast(include, message);
     }
 
     public void broadcastExcludingRoot(String rootPlayer, ServerMessage message) throws IOException {
         System.out.println("broadcastExcludingRoot");
         ArrayList<Connection> include = new ArrayList<>();
-        for (Connection connection: connections.values()) {
-            if (!connection.playerName.equals(rootPlayer)) {
-                include.add(connection);
+        //for (Connection connection: connections.values()) {
+        //    if (!connection.playerName.equals(rootPlayer)) {
+        //        include.add(connection);
+        //    }
+        //}
+        System.out.println(connections);
+        for (String playerName: connections.keySet()) {
+            if (!playerName.equals(rootPlayer)) {
+                include.add(connections.get(playerName));
             }
         }
+        System.out.println(include);
 
         broadcast(include, message);
     }
 
     public void broadcastToRoot(String rootPlayer, ServerMessage message) throws IOException {
         ArrayList<Connection> include = new ArrayList<>();
-        include.add(connections.get(rootPlayer));
+        Connection rootConnection = connections.get(rootPlayer);
+        //include.add(connections.get(rootPlayer));
+        if (rootConnection != null) {
+            include.add(rootConnection);
+        }
 
         broadcast(include, message);
     }
@@ -54,11 +69,14 @@ public class ConnectionManager {
                 removeList.add(connection);
             }
         }
+        System.out.println("after broadcast, connections: " + connections);
 
-        for (Connection connection: connections.values()) {
-            if (!includedPlayers.contains(connection) || removeList.contains(connection)) {
-                connections.remove(connection.playerName);
-            }
-        }
+        //for (Connection connection: connections.values()) {
+        //    if (!includedPlayers.contains(connection) || removeList.contains(connection)) {
+        //        connections.remove(connection.playerName);
+        //    }
+        //}
+
+        System.out.println("after loop thing, connections: " + connections);
     }
 }

@@ -27,6 +27,7 @@ public class WebSocketHandler implements Handler {
     ConnectionManager connections;
 
     public WebSocketHandler() {
+        System.out.println("CREATING NEW CONNECTION MANAGER");
         connections = new ConnectionManager();
     }
 
@@ -67,6 +68,7 @@ public class WebSocketHandler implements Handler {
         String auth = command.getAuthString();
         ChessGame.TeamColor playerColor = command.getPlayerColor();
         String playerName = command.getPlayerName();
+        System.out.println("name of joined player: " + playerName);
 
         ChessGame game = getGameFromID(gameID, auth);
 
@@ -78,6 +80,7 @@ public class WebSocketHandler implements Handler {
 
         // server sends NOTIFICATION to all other clients informing that root client has joined
         String message = playerName + " joined game as " + playerColor.toString();
+        System.out.println(message);
         ServerMessage notification = new NotificationMessage(message);
         connections.broadcastExcludingRoot(playerName, notification);
     }
@@ -86,6 +89,7 @@ public class WebSocketHandler implements Handler {
         int gameID = command.getGameID();
         String auth = command.getAuthString();
         String playerName = command.getPlayerName();
+        System.out.println("name of observer: " + playerName);
 
         ChessGame game = getGameFromID(gameID, auth);
 

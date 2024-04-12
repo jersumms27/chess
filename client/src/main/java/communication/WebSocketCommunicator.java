@@ -26,8 +26,8 @@ public class WebSocketCommunicator extends Endpoint {
     public WebSocketCommunicator(String url) throws Exception {
         try {
             url = url.replace("http", "ws");
-            //URI socketURI = new URI(url + "/connect");
-            URI socketURI = new URI(url);
+            URI socketURI = new URI(url + "/connect");
+            //URI socketURI = new URI(url);
 
             gson = new Gson();
             notifHandler = new NotificationHandler();
