@@ -1,27 +1,36 @@
 package communication;
+import com.google.gson.Gson;
 import webSocketMessages.serverMessages.*;
 
 public class NotificationHandler {
-    void notify(ServerMessage message) {
-        switch (message.getServerMessageType()) {
-            case ServerMessage.ServerMessageType.LOAD_GAME -> loadGame((LoadGameMessage) message);
-            case ServerMessage.ServerMessageType.NOTIFICATION -> notification((NotificationMessage) message);
-            case ServerMessage.ServerMessageType.ERROR -> error((ErrorMessage) message);
+    void notify(String message) {
+        Gson gson = new Gson();
+        try {
+            LoadGameMessage loadGameMessage = gson.fromJson(message, LoadGameMessage.class);
+            loadGame(loadGameMessage);
+        } catch (Exception ex) {
+            try {
+                NotificationMessage notificationMessage = gson.fromJson(message, NotificationMessage.class);
+                notification(notificationMessage);
+            } catch (Exception ex2) {
+                try {
+                    ErrorMessage errorMessage = gson.fromJson(message, ErrorMessage.class);
+                    error(errorMessage);
+                } catch (Exception ex3) {
+                }
+            }
         }
     }
 
     void loadGame(LoadGameMessage message) {
         System.out.println(message.getGame());
-        //System.exit(0);
     }
 
     void notification(NotificationMessage message) {
         System.out.println(message.getMessage());
-        //System.exit(0);
     }
 
     void error(ErrorMessage message) {
         System.out.println(message.getErrorMessage());
-        //System.exit(0);
     }
 }

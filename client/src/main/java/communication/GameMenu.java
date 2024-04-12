@@ -80,7 +80,7 @@ public class GameMenu {
     }
 
     public void redrawChessBoard() {
-        Board.drawBoard(currentGame, playerColor.equals(ChessGame.TeamColor.WHITE), false, null);
+        Board.drawBoard(currentGame, playerColor.equals(ChessGame.TeamColor.BLACK), false, null);
     }
 
     public void leave() throws IOException {
@@ -98,7 +98,7 @@ public class GameMenu {
             int startCol = columnConversion(arguments[0].substring(0, 1));
             int startRow = Integer.parseInt(arguments[0].substring(1));
             int endCol = columnConversion(arguments[1].substring(0, 1));
-            int endRow = Integer.parseInt(arguments[1].substring(1));
+            int endRow = rowConversion(Integer.parseInt(arguments[1].substring(1)));
             ChessPiece.PieceType promPiece = null;
             if (arguments.length == 3) {
                 promPiece = pieceConversion(arguments[2]);
@@ -128,35 +128,52 @@ public class GameMenu {
         try {
             int row = Integer.parseInt(input.substring(1));
             int col = columnConversion(input.substring(0, 1));
+            System.out.println("piece is at: " + row + ", " + col);
 
             ChessPosition pos = new ChessPosition(row, col);
-            Board.drawBoard(currentGame, playerColor.equals(ChessGame.TeamColor.WHITE), true, pos);
+            Board.drawBoard(currentGame, playerColor.equals(ChessGame.TeamColor.BLACK), true, pos);
         } catch (Exception ex) {
             System.out.println("Error: invalid input");
         }
     }
 
-    private int columnConversion(String rowLetter) {
-        switch (rowLetter) {
+    private int columnConversion(String letter) {
+        int num = 0;
+        switch (letter) {
             case "a":
-                return 1;
+                num = 1;
+                break;
             case "b":
-                return 2;
+                num =  2;
+                break;
             case "c":
-                return 3;
+                num =  3;
+                break;
             case "d":
-                return 4;
+                num =  4;
+                break;
             case "e":
-                return 5;
+                num =  5;
+                break;
             case"f":
-                return 6;
+                num =  6;
+                break;
             case "g":
-                return 7;
+                num =  7;
+                break;
             case"h":
-                return 8;
+                num =  8;
+                break;
         }
 
-        return 0;
+        if (playerColor.equals(ChessGame.TeamColor.WHITE)) {
+            return num;
+        }
+        return 9 - num;
+    }
+
+    private int rowConversion(int row) {
+        return 9 - row;
     }
 
     private ChessPiece.PieceType pieceConversion(String p) {

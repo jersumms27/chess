@@ -39,8 +39,8 @@ public class WebSocketCommunicator extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    ServerMessage notification = gson.fromJson(message, ServerMessage.class);
-                    notifHandler.notify(notification);
+                    //ServerMessage notification = gson.fromJson(message, ServerMessage.class);
+                    notifHandler.notify(message);
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {

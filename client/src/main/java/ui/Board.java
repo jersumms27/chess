@@ -32,9 +32,10 @@ public class Board {
 
         String[] regularRowHeader = {"a", "b", "c", "d", "e", "f", "g", "h"};
         String[] invertedRowHeader = {"h", "g", "f", "e", "d", "c", "b", "a"};
-        String[] invertedColHeader = {"8", "7", "6", "5", "4", "3", "2", "1"};
-        String[] regularColHeader = {"1", "2", "3", "4", "5", "6", "7", "8"};
-        String[] colHeader = {"8", "7", "6", "5", "4", "3", "2", "1"};
+        String[] regularColHeader = {"8", "7", "6", "5", "4", "3", "2", "1"};
+        String[] invertedColHeader = {"1", "2", "3", "4", "5", "6", "7", "8"};
+        //String[] colHeader = {"8", "7", "6", "5", "4", "3", "2", "1"};
+        String[] colHeader = {"1", "2", "3", "4", "5", "6", "7", "8"};
 
         String[] rowHeader;
         //String[] colHeader;
@@ -48,14 +49,23 @@ public class Board {
 
         drawHeader(rowHeader);
         System.out.println();
-        int startRow = 0;
-        int endRow = NUM_SQUARES;
-        int incrementRow = 1;
+        //int startRow = 0;
+        //int endRow = NUM_SQUARES;
+        //int incrementRow = 1;
+        //if (inverted) {
+        //    startRow = NUM_SQUARES - 1;
+        //    endRow = -1;
+        //    incrementRow = -1;
+        //}
+        int startRow = NUM_SQUARES - 1;
+        int endRow = -1;
+        int incrementRow = -1;
         if (inverted) {
-            startRow = NUM_SQUARES - 1;
-            endRow = -1;
-            incrementRow = -1;
+            startRow = 0;
+            endRow = NUM_SQUARES;
+            incrementRow = 1;
         }
+
         int actualRow = 1;
         for (int r = startRow; (r - endRow) * (r - endRow) != 0; r += incrementRow) {
             ChessPiece[] pieces = new ChessPiece[NUM_SQUARES];
@@ -67,7 +77,7 @@ public class Board {
                 pieces[c] = board.getPiece(new ChessPosition(r + 1, p + 1));
                 c ++;
             }
-            drawRow(pieces, colHeader[r], actualRow, game, highlight, start);
+            drawRow(pieces, colHeader[r], r + 1, game, highlight, start);
             actualRow ++;
             System.out.println();
         }
@@ -100,18 +110,25 @@ public class Board {
             if (c == 0 || c == NUM_SQUARES + 1) {
                 System.out.print(SET_TEXT_COLOR_BLACK);
                 System.out.print(SET_BG_COLOR_LIGHT_GREY);
-                System.out.print(rowNumber);
+                System.out.print(header);
             } else {
-                if (highlight && validEndPositions.contains(new ChessPosition(rowNumber, c))) {
-                    System.out.print(SET_BG_COLOR_GREEN);
-                //} else if (highlight && Objects.equals(start, new ChessPosition(rowNumber, c))) {
-                //    System.out.println(SET_BG_COLOR_YELLOW);
-                } else if (rowNumber % 2 == c % 2) {
-                    System.out.print(SET_BG_COLOR_WHITE);
+                if (highlight && Objects.equals(start, new ChessPosition(rowNumber, c))) {
+                    System.out.print(SET_BG_COLOR_YELLOW);
+                } else if ((rowNumber - 1) % 2 == c % 2) {
+                    if (highlight && validEndPositions.contains(new ChessPosition(rowNumber, c))) {
+                        System.out.print(SET_BG_COLOR_GREEN);
+                    } else {
+                        System.out.print(SET_BG_COLOR_WHITE);
+                    }
                 } else {
-                    System.out.print(SET_BG_COLOR_BLACK);
+                    if (highlight && validEndPositions.contains(new ChessPosition(rowNumber, c))) {
+                        System.out.print(SET_BG_COLOR_DARK_GREEN);
+                    } else {
+                        System.out.print(SET_BG_COLOR_BLACK);
+                    }
                 }
                 System.out.print(pieceToString(pieces[c - 1]));
+
             }
         }
         System.out.print(SET_BG_COLOR_DARK_GREY);
@@ -123,7 +140,7 @@ public class Board {
             return WIDTH_SPACE + " " + WIDTH_SPACE;
         }
         String str = "";
-        if (piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
+        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
             System.out.print(SET_TEXT_COLOR_BLUE);
         } else {
             System.out.print(SET_TEXT_COLOR_RED);
