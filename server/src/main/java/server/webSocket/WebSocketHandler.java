@@ -63,11 +63,12 @@ public class WebSocketHandler implements Handler {
         //}
     }
 
-    private void joinPlayer(JoinGameCommand command, Session session) throws IOException {
+    private void joinPlayer(JoinGameCommand command, Session session) throws IOException, DataAccessException {
         int gameID = command.getGameID();
         String auth = command.getAuthString();
         ChessGame.TeamColor playerColor = command.getPlayerColor();
-        String playerName = command.getPlayerName();
+        //String playerName = command.getPlayerName();
+        String playerName = authDAO.getUser(auth);
 
         ChessGame game = getGameFromID(gameID, auth);
 
@@ -83,10 +84,10 @@ public class WebSocketHandler implements Handler {
         connections.broadcastExcludingRoot(playerName, notification);
     }
 
-    private void joinObserver(JoinObserverCommand command, Session session) throws IOException {
+    private void joinObserver(JoinObserverCommand command, Session session) throws IOException, DataAccessException {
         int gameID = command.getGameID();
         String auth = command.getAuthString();
-        String playerName = command.getPlayerName();
+        String playerName = authDAO.getUser(auth);
 
         ChessGame game = getGameFromID(gameID, auth);
 
@@ -106,7 +107,7 @@ public class WebSocketHandler implements Handler {
         int gameID = command.getGameID();
         ChessMove move = command.getMove();
         String auth = command.getAuthString();
-        String playerName = command.getPlayerName();
+        String playerName = authDAO.getUser(auth);
 
         ChessGame game = getGameFromID(gameID, auth);
         game.makeMove(move);
@@ -125,7 +126,7 @@ public class WebSocketHandler implements Handler {
     private void leave(LeaveCommand command) throws IOException, DataAccessException {
         int gameID = command.getGameID();
         String auth = command.getAuthString();
-        String playerName = command.getPlayerName();
+        String playerName = authDAO.getUser(auth);
 
         ChessGame game = getGameFromID(gameID, auth);
         gameService.updateGame(game, gameID, playerName);
@@ -140,9 +141,10 @@ public class WebSocketHandler implements Handler {
 
     }
 
-    private void resign(ResignCommand command) throws IOException {
+    private void resign(ResignCommand command) throws IOException, DataAccessException {
         int gameID = command.getGameID();
-        String playerName = command.getPlayerName();
+        String auth = command.getAuthString();
+        String playerName = authDAO.getUser(auth);
 
         //TODO: server marks game as over, update game in database
 

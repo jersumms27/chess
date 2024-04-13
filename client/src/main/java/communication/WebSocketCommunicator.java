@@ -73,28 +73,29 @@ public class WebSocketCommunicator extends Endpoint {
     public void onOpen(javax.websocket.Session session, EndpointConfig endpointConfig) {
     }
 
-    public void joinPlayer(String auth, String playerName, int gameID, ChessGame.TeamColor playerColor) throws IOException {
-        JoinGameCommand command = new JoinGameCommand(auth, playerName, gameID, playerColor);
+    public void joinPlayer(String auth, int gameID, ChessGame.TeamColor playerColor) throws IOException {
+        JoinGameCommand command = new JoinGameCommand(auth, gameID, playerColor);
+        System.out.println(gson.toJson(command));
         this.session.getBasicRemote().sendText(gson.toJson(command));
     }
 
-    public void joinObserver(String auth, String playerName, int gameID) throws IOException {
-        JoinObserverCommand command = new JoinObserverCommand(auth, playerName, gameID);
+    public void joinObserver(String auth, int gameID) throws IOException {
+        JoinObserverCommand command = new JoinObserverCommand(auth, gameID);
         this.session.getBasicRemote().sendText(gson.toJson(command));
     }
 
-    public void makeMove(String auth, String playerName, int gameID, ChessMove move, String moveStr) throws IOException {
-        MakeMoveCommand command = new MakeMoveCommand(auth, playerName, gameID, move, moveStr);
+    public void makeMove(String auth, int gameID, ChessMove move, String moveStr) throws IOException {
+        MakeMoveCommand command = new MakeMoveCommand(auth, gameID, move, moveStr);
         this.session.getBasicRemote().sendText(gson.toJson(command));
     }
 
-    public void leave(String auth, String playerName, int gameID) throws IOException {
-        LeaveCommand command = new LeaveCommand(auth, playerName, gameID);
+    public void leave(String auth, int gameID) throws IOException {
+        LeaveCommand command = new LeaveCommand(auth, gameID);
         this.session.getBasicRemote().sendText(gson.toJson(command));
     }
 
-    public void resign(String auth, String playerName, int gameID) throws IOException {
-        ResignCommand command = new ResignCommand(auth, playerName, gameID);
+    public void resign(String auth, int gameID) throws IOException {
+        ResignCommand command = new ResignCommand(auth, gameID);
         this.session.getBasicRemote().sendText(gson.toJson(command));
     }
 

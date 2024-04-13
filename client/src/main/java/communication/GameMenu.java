@@ -33,12 +33,12 @@ public class GameMenu {
         communicator = new WebSocketCommunicator(url, this);
 
         if (observer) {
-            communicator.joinObserver(auth, playerName, gameID);
+            communicator.joinObserver(auth, gameID);
             //currentGame = communicator.getGame();
             //setGame();
             //redrawChessBoard();
         } else {
-            communicator.joinPlayer(auth, playerName, gameID, playerColor);
+            communicator.joinPlayer(auth, gameID, playerColor);
             //currentGame = communicator.getGame();
             //setGame();
             //redrawChessBoard();
@@ -92,7 +92,7 @@ public class GameMenu {
     public void leave() throws IOException {
         quit = true;
         //currentGame = communicator.leave(auth, playerName, gameID);
-        communicator.leave(auth, playerName, gameID);
+        communicator.leave(auth, gameID);
     }
 
     public void makeMove() {
@@ -117,7 +117,7 @@ public class GameMenu {
 
             errorString = "Error: illegal move";
             currentGame.makeMove(move, playerColor);
-            communicator.makeMove(auth, playerName, gameID, move, input);
+            communicator.makeMove(auth, gameID, move, input);
             //redrawChessBoard();
         } catch (Exception ex) {
             System.out.println(errorString);
@@ -125,7 +125,7 @@ public class GameMenu {
     }
 
     public void resign() throws IOException, InterruptedException {
-        communicator.resign(auth, playerName, gameID);
+        communicator.resign(auth, gameID);
     }
 
     public void highlightLegalMoves() {
