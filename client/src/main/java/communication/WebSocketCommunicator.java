@@ -3,15 +3,15 @@ package communication;
 import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
-import org.eclipse.jetty.*;
-import org.eclipse.jetty.client.HttpResponseException;
+//import org.eclipse.jetty.*;
+//import org.eclipse.jetty.client.HttpResponseException;
 //import org.eclipse.jetty.websocket.api.Session;
-import javax.management.Notification;
+//import javax.management.Notification;
 import javax.websocket.Session;
 
-import com.google.gson.Gson;
+//import com.google.gson.Gson;
 //import exception.ResponseException;
-import webSocketMessages.serverMessages.*;
+//import webSocketMessages.serverMessages.*;
 import webSocketMessages.userCommands.*;
 
 import javax.websocket.*;
