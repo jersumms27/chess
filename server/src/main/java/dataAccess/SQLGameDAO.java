@@ -149,22 +149,7 @@ public class SQLGameDAO implements GameDAO {
 
     @Override
     public void verifyColor(int id, String color) throws DataAccessException {
-        String statement;
-        if (color.equals("WHITE")) {
-            statement = """
-                    SELECT whiteUsername
-                    FROM `game`
-                    WHERE `id` = ?;
-                    """;
-        } else if (color.equals("BLACK")) {
-            statement = """
-                    SELECT blackUsername
-                    FROM `game`
-                    WHERE `id` = ?;
-                    """;
-        } else {
-            throw new DataAccessException("Invalid color");
-        }
+        String statement = getVerifyStatement(color);
 
         try (ResultSet resultSet = DatabaseManager.executeQuery(statement, id)) {
             if ((color.equals("WHITE") && resultSet.next() && resultSet.getString("whiteUsername") != null)
@@ -178,6 +163,19 @@ public class SQLGameDAO implements GameDAO {
 
     @Override
     public void verifyColor(int id, String color, String username) throws DataAccessException {
+        String statement = getVerifyStatement(color);
+
+        try (ResultSet resultSet = DatabaseManager.executeQuery(statement, id)) {
+            if ((color.equals("WHITE") && resultSet.next() && !Objects.equals(resultSet.getString("whiteUsername"), username))
+                    || color.equals("BLACK") && resultSet.next() && !Objects.equals(resultSet.getString("blackUsername"), username)) {
+                throw new DataAccessException("Color not available");
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("User not found");
+        }
+    }
+
+    private static String getVerifyStatement(String color) throws DataAccessException {
         String statement;
         if (color.equals("WHITE")) {
             statement = """
@@ -194,14 +192,6 @@ public class SQLGameDAO implements GameDAO {
         } else {
             throw new DataAccessException("Invalid color");
         }
-
-        try (ResultSet resultSet = DatabaseManager.executeQuery(statement, id)) {
-            if ((color.equals("WHITE") && resultSet.next() && !Objects.equals(resultSet.getString("whiteUsername"), username))
-                    || color.equals("BLACK") && resultSet.next() && !Objects.equals(resultSet.getString("blackUsername"), username)) {
-                throw new DataAccessException("Color not available");
-            }
-        } catch (SQLException ex) {
-            throw new DataAccessException("User not found");
-        }
+        return statement;
     }
 }

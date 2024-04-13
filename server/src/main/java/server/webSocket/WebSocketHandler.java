@@ -219,8 +219,6 @@ public class WebSocketHandler implements Handler {
         }
         resigned = true;
 
-        //TODO: server marks game as over, update game in database
-
         String message = playerName + " resigned from the game";
         ServerMessage notification = new NotificationMessage(message);
         connections.broadcastToEveryone(playerName, notification);
