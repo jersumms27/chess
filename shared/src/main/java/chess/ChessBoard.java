@@ -15,16 +15,7 @@ public class ChessBoard {
     //private HashMap<ChessPosition, ChessPiece> board;
     private ChessPiece[][] board;
     public ChessBoard() {
-        //board = new HashMap<>();
-        //for(int r = 1; r < 9; r++){
-        //    for(int c = 1; c < 9; c++){
-        //        ChessPosition key = new ChessPosition(r, c);
-        //        board.put(key, null);
-        //    }
-        //}
-
         board = new ChessPiece[8][8];
-
     }
 
     /**
@@ -34,11 +25,9 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        //board.put(position, piece);
         int row = position.getRow() - 1;
         int col = position.getColumn() - 1;
 
-        //board[position.getRow()][position.getColumn()] = piece;
         board[row][col] = piece;
     }
 
@@ -50,7 +39,6 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        //return board.get(position);
         int row = position.getRow() - 1;
         int col = position.getColumn() - 1;
 

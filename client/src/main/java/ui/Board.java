@@ -14,19 +14,6 @@ public class Board {
     private static final int SQUARE_SIZE_IN_CHARS = 3;
     private static final String WIDTH_SPACE = "  ";
 
-
-    //public static void main(String[] args) {
-    //    var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-
-    //    out.print(ERASE_SCREEN);
-    //    ChessBoard board = new ChessBoard();
-    //    board.resetBoard();
-
-    //    drawBoard(board, false);
-    //    out.println();
-    //    drawBoard(board, true);
-    //}
-
     public static void drawBoard(ChessGame game, boolean inverted, boolean highlight, ChessPosition start) { // default is white's perspective
         ChessBoard board = game.getGameBoard();
 
@@ -49,14 +36,6 @@ public class Board {
 
         drawHeader(rowHeader);
         System.out.println();
-        //int startRow = 0;
-        //int endRow = NUM_SQUARES;
-        //int incrementRow = 1;
-        //if (inverted) {
-        //    startRow = NUM_SQUARES - 1;
-        //    endRow = -1;
-        //    incrementRow = -1;
-        //}
         int startRow = NUM_SQUARES - 1;
         int endRow = -1;
         int incrementRow = -1;
