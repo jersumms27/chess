@@ -4,9 +4,7 @@ import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
-import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import org.eclipse.jetty.websocket.api.annotations.*;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.glassfish.tyrus.core.wsadl.model.Endpoint;
 import webSocketMessages.userCommands.*;
@@ -18,7 +16,7 @@ import java.net.URISyntaxException;
 
 // WebSocket endpoint annotation
 @WebSocket
-public class WebSocketCommunicator extends Endpoint {
+public class WebSocketCommunicator {
     Session session;
     Gson gson;
     NotificationHandler notifHandler;
