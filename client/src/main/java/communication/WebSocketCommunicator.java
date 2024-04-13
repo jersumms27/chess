@@ -3,24 +3,21 @@ package communication;
 import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
-import org.eclipse.jetty.*;
-import org.eclipse.jetty.client.HttpResponseException;
-//import org.eclipse.jetty.websocket.api.Session;
-import javax.management.Notification;
-import javax.websocket.Session;
-
-import com.google.gson.Gson;
-//import exception.ResponseException;
-import webSocketMessages.serverMessages.*;
+import org.eclipse.jetty.websocket.client.WebSocketClient;
+import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
+import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import webSocketMessages.userCommands.*;
 
-import javax.websocket.*;
+import javax.websocket.DeploymentException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-// CLIENT sends commands to SERVER
-public class WebSocketCommunicator extends Endpoint {
+// WebSocket endpoint annotation
+@WebSocket
+public class WebSocketCommunicator {
     Session session;
     Gson gson;
     NotificationHandler notifHandler;
@@ -36,68 +33,52 @@ public class WebSocketCommunicator extends Endpoint {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/connect");
-            //URI socketURI = new URI(url);
 
             gson = new Gson();
             notifHandler = new NotificationHandler();
 
-            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-            this.session = container.connectToServer(this, socketURI);
+            WebSocketClient client = new WebSocketClient();
+            client.start();
+            client.connect(this, socketURI);
 
-            // set message handler
-            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
-                @Override
-                public void onMessage(String message) {
-                    //ServerMessage notification = gson.fromJson(message, ServerMessage.class);
-                    ChessGame potentialNewGame = notifHandler.notify(message);
-                    if (potentialNewGame != null) {
-                        newGame = potentialNewGame;
-                    }
-                    synchronized (lock) {
-                        gameUpdated = true;
-                        lock.notifyAll();
-                    }
-                    try {
-                        setGame();
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                }
-            });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
             throw new Exception(ex.getMessage());
         }
     }
 
-    @Override
-    public void onOpen(javax.websocket.Session session, EndpointConfig endpointConfig) {
+    @OnWebSocketConnect
+    public void onConnect(Session session) {
+        this.session = session;
+    }
+
+    @OnWebSocketError
+    public void onError(Throwable cause) {
+        // Handle error
     }
 
     public void joinPlayer(String auth, int gameID, ChessGame.TeamColor playerColor) throws IOException {
         JoinGameCommand command = new JoinGameCommand(auth, gameID, playerColor);
-        System.out.println(gson.toJson(command));
-        this.session.getBasicRemote().sendText(gson.toJson(command));
+        session.getRemote().sendString(gson.toJson(command));
     }
 
     public void joinObserver(String auth, int gameID) throws IOException {
         JoinObserverCommand command = new JoinObserverCommand(auth, gameID);
-        this.session.getBasicRemote().sendText(gson.toJson(command));
+        this.session.getRemote().sendString(gson.toJson(command));
     }
 
     public void makeMove(String auth, int gameID, ChessMove move, String moveStr) throws IOException {
         MakeMoveCommand command = new MakeMoveCommand(auth, gameID, move, moveStr);
-        this.session.getBasicRemote().sendText(gson.toJson(command));
+        this.session.getRemote().sendString(gson.toJson(command));
     }
 
     public void leave(String auth, int gameID) throws IOException {
         LeaveCommand command = new LeaveCommand(auth, gameID);
-        this.session.getBasicRemote().sendText(gson.toJson(command));
+        this.session.getRemote().sendString(gson.toJson(command));
     }
 
     public void resign(String auth, int gameID) throws IOException {
         ResignCommand command = new ResignCommand(auth, gameID);
-        this.session.getBasicRemote().sendText(gson.toJson(command));
+        this.session.getRemote().sendString(gson.toJson(command));
     }
 
     public void setGame() throws InterruptedException {
