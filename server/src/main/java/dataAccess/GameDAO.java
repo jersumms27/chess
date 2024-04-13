@@ -2,6 +2,7 @@ package dataAccess;
 
 import model.*;
 
+import java.sql.SQLException;
 import java.util.Collection;
 
 public interface GameDAO {
@@ -11,4 +12,7 @@ public interface GameDAO {
     Collection<GameData> listGames() throws DataAccessException;
     void updateGame(GameData data) throws DataAccessException;
     void verifyColor(int id, String color) throws DataAccessException;
+    void verifyColor(int id, String color, String username) throws DataAccessException;
+
+    int nextAvailableID() throws DataAccessException, SQLException;
 }

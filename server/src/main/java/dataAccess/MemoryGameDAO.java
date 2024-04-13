@@ -3,6 +3,8 @@ package dataAccess;
 import chess.*;
 import model.GameData;
 
+import javax.xml.crypto.Data;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -58,5 +60,15 @@ public class MemoryGameDAO implements GameDAO {
         if (username != null) {
             throw new DataAccessException("Color not available");
         }
+    }
+
+    @Override
+    public void verifyColor(int id, String color, String username) throws DataAccessException {
+
+    }
+
+    @Override
+    public int nextAvailableID() throws DataAccessException, SQLException {
+        return 0;
     }
 }

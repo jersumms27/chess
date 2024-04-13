@@ -68,7 +68,6 @@ public class WebSocketCommunicator extends Endpoint {
 
     public void joinPlayer(String auth, int gameID, ChessGame.TeamColor playerColor) throws IOException {
         JoinGameCommand command = new JoinGameCommand(auth, gameID, playerColor);
-        System.out.println(gson.toJson(command));
         this.session.getBasicRemote().sendText(gson.toJson(command));
     }
 
@@ -77,8 +76,8 @@ public class WebSocketCommunicator extends Endpoint {
         this.session.getBasicRemote().sendText(gson.toJson(command));
     }
 
-    public void makeMove(String auth, int gameID, ChessMove move, String moveStr) throws IOException {
-        MakeMoveCommand command = new MakeMoveCommand(auth, gameID, move, moveStr);
+    public void makeMove(String auth, int gameID, ChessMove move, String moveStr, ChessGame.TeamColor playerColor) throws IOException {
+        MakeMoveCommand command = new MakeMoveCommand(auth, gameID, move, moveStr, playerColor);
         this.session.getBasicRemote().sendText(gson.toJson(command));
     }
 

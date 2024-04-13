@@ -110,7 +110,7 @@ public class GameMenu {
 
             errorString = "Error: illegal move";
             currentGame.makeMove(move, playerColor);
-            communicator.makeMove(auth, gameID, move, input);
+            communicator.makeMove(auth, gameID, move, input, playerColor);
         } catch (Exception ex) {
             System.out.println(errorString);
         }

@@ -16,12 +16,14 @@ import java.util.Objects;
 public class ChessGame {
     private ChessBoard gameBoard;
     private TeamColor teamTurn;
+    private boolean gameOver;
 
     public ChessGame() {
         gameBoard = new ChessBoard();
         gameBoard.resetBoard();
 
         teamTurn = TeamColor.WHITE;
+        gameOver = false;
     }
 
     /**
@@ -98,13 +100,17 @@ public class ChessGame {
         ChessPiece piece = gameBoard.getPiece(startPos);
 
         //check if invalid move
-        if (piece == null || piece.getTeamColor() != teamTurn || !validMoves(startPos).contains(move)) {
+        if (piece == null || piece.getTeamColor() != teamTurn || !validMoves(startPos).contains(move) || gameOver) {
             throw new InvalidMoveException("Invalid move");
         }
 
         //make the actual move
         gameBoard.movePiece(move);
         changeTeamTurn();
+
+        if (isInCheckmate(TeamColor.BLACK) || isInCheckmate(TeamColor.WHITE) || isInStalemate(TeamColor.BLACK) || isInStalemate(TeamColor.WHITE)) {
+            gameOver = true;
+        }
     }
 
     public void makeMove(ChessMove move, TeamColor playerColor) throws InvalidMoveException {
@@ -113,6 +119,10 @@ public class ChessGame {
 
         //check if invalid move
         if (piece == null || piece.getTeamColor() != teamTurn || piece.getTeamColor() != playerColor || !validMoves(startPos).contains(move)) {
+            System.out.println(piece == null);
+            System.out.println(piece.getTeamColor() != teamTurn);
+            System.out.println(piece.getTeamColor() != playerColor);
+            System.out.println(!validMoves(startPos).contains(move) + "\n");
             throw new InvalidMoveException("Invalid move");
         }
 

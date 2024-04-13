@@ -4,6 +4,7 @@ import chess.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import dataAccess.DataAccessException;
+import dataAccess.DatabaseManager;
 import handler.GameHandler;
 import handler.Handler;
 import handler.UserHandler;
@@ -20,15 +21,18 @@ import webSocketMessages.serverMessages.*;
 
 import javax.swing.*;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Collection;
 
 // SERVER sends messages and receives commands from CLIENT
 @WebSocket
 public class WebSocketHandler implements Handler {
     ConnectionManager connections;
+    boolean resigned;
 
     public WebSocketHandler() {
         connections = new ConnectionManager();
+        boolean resigned = false;
     }
 
     @OnWebSocketMessage
@@ -55,15 +59,44 @@ public class WebSocketHandler implements Handler {
         }
     }
 
-    private void joinPlayer(JoinGameCommand command, Session session) throws IOException, DataAccessException {
+    private void joinPlayer(JoinGameCommand command, Session session) throws IOException, DataAccessException, SQLException {
         int gameID = command.getGameID();
         String auth = command.getAuthString();
         ChessGame.TeamColor playerColor = command.getPlayerColor();
-        String playerName = authDAO.getUser(auth);
+        String playerName = "";
+
+        // checks for valid auth token
+        try {
+            playerName = authDAO.getUser(auth);
+        } catch (DataAccessException ex) {
+            playerName = "invalid";
+            connections.add(playerName, session, gameID);
+            String message = "Error: invalid auth token";
+            sendError(playerName, message);
+            return;
+        }
 
         ChessGame game = getGameFromID(gameID, auth);
 
         connections.add(playerName, session, gameID);
+
+        // check if color has already been taken
+        try {
+            gameDAO.verifyColor(gameID, playerColor.toString(), playerName);
+        } catch (DataAccessException ex) {
+            String message = "Error: color already taken";
+            sendError(playerName, message);
+            connections.remove(playerName);
+            return;
+        }
+
+        // check if gameID valid
+        if (gameDAO.nextAvailableID() <= gameID) {
+            String message = "Error: game does not exist";
+            sendError(playerName, message);
+            connections.remove(playerName);
+            return;
+        }
 
         // server sends LOAD_GAME message back to root client
         ServerMessage loadGame = new LoadGameMessage(game);
@@ -75,14 +108,34 @@ public class WebSocketHandler implements Handler {
         connections.broadcastExcludingRoot(playerName, notification);
     }
 
-    private void joinObserver(JoinObserverCommand command, Session session) throws IOException, DataAccessException {
+    private void joinObserver(JoinObserverCommand command, Session session) throws IOException, DataAccessException, SQLException {
         int gameID = command.getGameID();
         String auth = command.getAuthString();
-        String playerName = authDAO.getUser(auth);
+        String playerName = "";
+
+        // checks for valid auth token
+        try {
+            playerName = authDAO.getUser(auth);
+        } catch (DataAccessException ex) {
+            playerName = "invalid";
+            connections.add(playerName, session, gameID);
+            String message = "Error: invalid auth token";
+            sendError(playerName, message);
+            connections.remove(playerName);
+            return;
+        }
 
         ChessGame game = getGameFromID(gameID, auth);
 
         connections.add(playerName, session, gameID);
+
+        // check if gameID valid
+        if (gameDAO.nextAvailableID() <= gameID) {
+            String message = "Error: game does not exist";
+            sendError(playerName, message);
+            connections.remove(playerName);
+            return;
+        }
 
         // server sends LOAD_GAME message back to root client
         ServerMessage loadGame = new LoadGameMessage(game);
@@ -99,9 +152,20 @@ public class WebSocketHandler implements Handler {
         ChessMove move = command.getMove();
         String auth = command.getAuthString();
         String playerName = authDAO.getUser(auth);
+        ChessGame.TeamColor playerColor = command.getPlayerColor();
 
         ChessGame game = getGameFromID(gameID, auth);
-        game.makeMove(move);
+
+        // check if move is valid
+        try {
+            //assert game != null;
+            game.makeMove(move, playerColor);
+            checkResigned();
+        } catch (InvalidMoveException ex) {
+            String message = "Error: invalid move";
+            sendError(playerName, message);
+            return;
+        }
         gameService.updateGame(game, gameID, "");
 
         // server sends LOAD_GAME message to all clients
@@ -134,6 +198,26 @@ public class WebSocketHandler implements Handler {
         int gameID = command.getGameID();
         String auth = command.getAuthString();
         String playerName = authDAO.getUser(auth);
+        try {
+            gameDAO.verifyColor(gameID, ChessGame.TeamColor.BLACK.toString(), playerName);
+        } catch (DataAccessException ex) {
+            try {
+                gameDAO.verifyColor(gameID, ChessGame.TeamColor.WHITE.toString(), playerName);
+            } catch (DataAccessException ex2) {
+                String message = "Error: cannot resign";
+                sendError(playerName, message);
+                return;
+            }
+        }
+
+        try {
+            checkResigned();
+        } catch (InvalidMoveException ex) {
+            String message = "Error: cannot resign";
+            sendError(playerName, message);
+            return;
+        }
+        resigned = true;
 
         //TODO: server marks game as over, update game in database
 
@@ -153,5 +237,16 @@ public class WebSocketHandler implements Handler {
         }
 
         return null;
+    }
+
+    private void sendError(String playerName, String message) throws IOException {;
+        ServerMessage error = new ErrorMessage(message);
+        connections.broadcastToRoot(playerName, error);
+    }
+
+    private void checkResigned() throws InvalidMoveException {
+        if (resigned) {
+            throw new InvalidMoveException("Game is already over");
+        }
     }
 }
