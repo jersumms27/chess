@@ -3,6 +3,7 @@ package communication;
 import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
+import org.eclipse.jetty.*;
 import org.eclipse.jetty.client.HttpResponseException;
 //import org.eclipse.jetty.websocket.api.Session;
 import javax.management.Notification;
