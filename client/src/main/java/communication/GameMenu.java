@@ -34,14 +34,8 @@ public class GameMenu {
 
         if (observer) {
             communicator.joinObserver(auth, gameID);
-            //currentGame = communicator.getGame();
-            //setGame();
-            //redrawChessBoard();
         } else {
             communicator.joinPlayer(auth, gameID, playerColor);
-            //currentGame = communicator.getGame();
-            //setGame();
-            //redrawChessBoard();
         }
         menu();
     }
@@ -91,7 +85,6 @@ public class GameMenu {
 
     public void leave() throws IOException {
         quit = true;
-        //currentGame = communicator.leave(auth, playerName, gameID);
         communicator.leave(auth, gameID);
     }
 
@@ -118,7 +111,6 @@ public class GameMenu {
             errorString = "Error: illegal move";
             currentGame.makeMove(move, playerColor);
             communicator.makeMove(auth, gameID, move, input);
-            //redrawChessBoard();
         } catch (Exception ex) {
             System.out.println(errorString);
         }
@@ -131,11 +123,9 @@ public class GameMenu {
     public void highlightLegalMoves() {
         System.out.println("Enter position of piece:");
         String input = scanner.nextLine();
-        //String[] arguments = input.split(" ");
         try {
             int row = Integer.parseInt(input.substring(1));
             int col = columnConversion(input.substring(0, 1));
-            //System.out.println("piece is at: " + row + ", " + col);
 
             ChessPosition pos = new ChessPosition(row, col);
             Board.drawBoard(currentGame, playerColor.equals(ChessGame.TeamColor.BLACK), true, pos);
@@ -179,10 +169,6 @@ public class GameMenu {
         return 9 - num;
     }
 
-    private int rowConversion(int row) {
-        return 9 - row;
-    }
-
     private ChessPiece.PieceType pieceConversion(String p) {
         ChessPiece.PieceType type = null;
         switch (p) {
@@ -202,10 +188,4 @@ public class GameMenu {
 
         return type;
     }
-
-    //private void setGame() throws InterruptedException {
-    //    System.out.println("starting update");
-    //    currentGame = communicator.getGame();
-    //    System.out.println("ending update");
-    //}
 }

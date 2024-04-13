@@ -216,14 +216,6 @@ public class Menu {
             String gameJson = gson.toJson(response.get("game"));
             ChessGame game = gson.fromJson(gameJson, ChessGame.class);
 
-            //ChessBoard board = new ChessBoard();
-            //board.resetBoard();
-            //if (color.equalsIgnoreCase("black")) {
-            //    Board.drawBoard(board, true);
-            //} else {
-            //    Board.drawBoard(board, false);
-            //}
-
             ChessGame.TeamColor playerColor = ChessGame.TeamColor.WHITE;
             if (color.equalsIgnoreCase("black")) {
                 playerColor = ChessGame.TeamColor.BLACK;
@@ -246,11 +238,6 @@ public class Menu {
             String gameJson = gson.toJson(response.get("game"));
             ChessGame game = gson.fromJson(gameJson, ChessGame.class);
             int gameID = Integer.parseInt(id);
-            //ChessBoard board = new ChessBoard();
-            //board.resetBoard();
-            //Board.drawBoard(board, true);
-            //System.out.println();
-            //Board.drawBoard(board, false);
 
             GameMenu gameMenu = new GameMenu(url, true, authToken, playerName, null, gameID, game);
         } catch (Exception ex) {

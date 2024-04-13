@@ -22,7 +22,6 @@ public class ConnectionManager {
     }
 
     public void broadcastToEveryone(String rootPlayer, ServerMessage message) throws IOException {
-        //broadcast(new ArrayList<>(connections.values()), message);
         ArrayList<Connection> include = new ArrayList<>();
         System.out.println("broadcasting to everyone, root player name: " + rootPlayer + ", id is " + connections.get(rootPlayer).gameID);
         System.out.println(connections.get(rootPlayer));
@@ -42,11 +41,6 @@ public class ConnectionManager {
     public void broadcastExcludingRoot(String rootPlayer, ServerMessage message) throws IOException {
         ArrayList<Connection> include = new ArrayList<>();
         int gameID = connections.get(rootPlayer).gameID;
-        //for (Connection connection: connections.values()) {
-        //    if (!connection.playerName.equals(rootPlayer)) {
-        //        include.add(connection);
-        //    }
-        //}
         for (String playerName: connections.keySet()) {
             if (!playerName.equals(rootPlayer) && connections.get(playerName).gameID == gameID) {
                 include.add(connections.get(playerName));
@@ -59,7 +53,6 @@ public class ConnectionManager {
     public void broadcastToRoot(String rootPlayer, ServerMessage message) throws IOException {
         ArrayList<Connection> include = new ArrayList<>();
         Connection rootConnection = connections.get(rootPlayer);
-        //include.add(connections.get(rootPlayer));
         if (rootConnection != null) {
             include.add(rootConnection);
         }
@@ -76,11 +69,5 @@ public class ConnectionManager {
                 removeList.add(connection);
             }
         }
-
-        //for (Connection connection: connections.values()) {
-        //    if (!includedPlayers.contains(connection) || removeList.contains(connection)) {
-        //        connections.remove(connection.playerName);
-        //    }
-        //}
     }
 }

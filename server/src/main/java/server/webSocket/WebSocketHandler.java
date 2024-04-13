@@ -53,21 +53,12 @@ public class WebSocketHandler implements Handler {
             ResignCommand resignCommand = gson.fromJson(message, ResignCommand.class);
             resign(resignCommand);
         }
-
-        //switch (command.getCommandType()) {
-        //    case JOIN_PLAYER -> joinPlayer(command, session);
-        //    case JOIN_OBSERVER -> joinObserver((JoinObserverCommand) command, session);
-        //    case MAKE_MOVE -> makeMove((MakeMoveCommand) command);
-        //    case LEAVE -> leave((LeaveCommand) command);
-        //    case RESIGN -> resign((ResignCommand) command);
-        //}
     }
 
     private void joinPlayer(JoinGameCommand command, Session session) throws IOException, DataAccessException {
         int gameID = command.getGameID();
         String auth = command.getAuthString();
         ChessGame.TeamColor playerColor = command.getPlayerColor();
-        //String playerName = command.getPlayerName();
         String playerName = authDAO.getUser(auth);
 
         ChessGame game = getGameFromID(gameID, auth);
@@ -131,8 +122,6 @@ public class WebSocketHandler implements Handler {
         ChessGame game = getGameFromID(gameID, auth);
         gameService.updateGame(game, gameID, playerName);
 
-        //connections.remove(playerName);
-
         // servers sends NOTIFICATION to all other clients that root client has left
         String message = playerName + " left the game";
         ServerMessage notification = new NotificationMessage(message);
@@ -154,7 +143,6 @@ public class WebSocketHandler implements Handler {
     }
 
     private ChessGame getGameFromID(int gameID, String auth) {
-        //ListGamesResponse response = gson.fromJson(gameService.listGames(auth), ListGamesResponse.class);
         ListGamesResponse response = gameService.listGames(auth);
 
         Collection<GameData> games = response.games();
