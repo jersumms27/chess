@@ -3,11 +3,11 @@ package communication;
 import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
-import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import org.eclipse.jetty.websocket.client.WebSocketClient;
 import webSocketMessages.userCommands.*;
 
 import javax.websocket.DeploymentException;
