@@ -8,6 +8,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
+import org.glassfish.tyrus.core.wsadl.model.Endpoint;
 import webSocketMessages.userCommands.*;
 
 import javax.websocket.DeploymentException;
@@ -17,7 +18,7 @@ import java.net.URISyntaxException;
 
 // WebSocket endpoint annotation
 @WebSocket
-public class WebSocketCommunicator {
+public class WebSocketCommunicator extends Endpoint {
     Session session;
     Gson gson;
     NotificationHandler notifHandler;
