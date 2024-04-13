@@ -77,7 +77,7 @@ public class Board {
                 pieces[c] = board.getPiece(new ChessPosition(r + 1, p + 1));
                 c ++;
             }
-            drawRow(pieces, colHeader[r], r + 1, game, highlight, start);
+            drawRow(pieces, colHeader[r], r + 1, inverted, game, highlight, start);
             actualRow ++;
             System.out.println();
         }
@@ -97,7 +97,11 @@ public class Board {
         System.out.print(SET_BG_COLOR_DARK_GREY);
     }
 
-    private static void drawRow(ChessPiece[] pieces, String header, int rowNumber, ChessGame game, boolean highlight, ChessPosition start) {
+    private static void drawRow(ChessPiece[] pieces, String header, int rowNumber, boolean inverted, ChessGame game, boolean highlight, ChessPosition start) {
+        int squareNum = rowNumber;
+        if (!inverted) {
+            squareNum -= 1;
+        }
         Collection<ChessPosition> validEndPositions = new ArrayList<>();
         if (highlight) {
             Collection<ChessMove> validMoves = game.validMoves(start);
@@ -114,7 +118,7 @@ public class Board {
             } else {
                 if (highlight && Objects.equals(start, new ChessPosition(rowNumber, c))) {
                     System.out.print(SET_BG_COLOR_YELLOW);
-                } else if ((rowNumber - 1) % 2 == c % 2) {
+                } else if (squareNum % 2 == c % 2) {
                     if (highlight && validEndPositions.contains(new ChessPosition(rowNumber, c))) {
                         System.out.print(SET_BG_COLOR_GREEN);
                     } else {
@@ -127,7 +131,7 @@ public class Board {
                         System.out.print(SET_BG_COLOR_BLACK);
                     }
                 }
-                System.out.print(pieceToString(pieces[c - 1]));
+                System.out.print(pieceToString(pieces[8 - c]));
 
             }
         }

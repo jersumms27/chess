@@ -117,7 +117,7 @@ public class WebSocketHandler implements Handler {
         connections.broadcastToEveryone(playerName, loadGame);
 
         // server sends NOTIFICATION to all other clients informing what move was made
-        String message = playerName + " made the move " + move.toString();
+        String message = playerName + " made the move " + command.getMoveStr();
         ServerMessage notification = new NotificationMessage(message);
         connections.broadcastExcludingRoot(playerName, notification);
     }
@@ -130,12 +130,14 @@ public class WebSocketHandler implements Handler {
         ChessGame game = getGameFromID(gameID, auth);
         gameService.updateGame(game, gameID, playerName);
 
-        connections.remove(playerName);
+        //connections.remove(playerName);
 
         // servers sends NOTIFICATION to all other clients that root client has left
         String message = playerName + " left the game";
         ServerMessage notification = new NotificationMessage(message);
-        connections.broadcastToEveryone(playerName, notification);
+        connections.broadcastExcludingRoot(playerName, notification);
+        connections.remove(playerName);
+
     }
 
     private void resign(ResignCommand command) throws IOException {

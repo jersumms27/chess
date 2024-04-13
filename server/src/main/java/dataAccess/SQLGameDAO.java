@@ -12,11 +12,26 @@ import java.util.Collection;
 public class SQLGameDAO implements GameDAO {
     int id;
     public SQLGameDAO() {
-        id = 0;
         try {
             DatabaseManager.createDatabase();
             DatabaseManager.createGameTable();
-        } catch (DataAccessException ex) {
+            id = nextAvailableID();
+        } catch (DataAccessException | SQLException ex) {
+            id = 0;
+        }
+    }
+
+    private int nextAvailableID() throws DataAccessException, SQLException {
+        String statement = "SELECT MAX(id) FROM game;";
+        try (ResultSet resultSet = DatabaseManager.executeQuery(statement)) {
+            if (resultSet.next()) {
+                int maxID = resultSet.getInt(1);
+                return maxID + 1;
+            } else {
+                return 1;
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Error getting id");
         }
     }
 

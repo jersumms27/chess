@@ -24,10 +24,15 @@ public class ConnectionManager {
     public void broadcastToEveryone(String rootPlayer, ServerMessage message) throws IOException {
         //broadcast(new ArrayList<>(connections.values()), message);
         ArrayList<Connection> include = new ArrayList<>();
+        System.out.println("broadcasting to everyone, root player name: " + rootPlayer + ", id is " + connections.get(rootPlayer).gameID);
+        System.out.println(connections.get(rootPlayer));
         int gameID = connections.get(rootPlayer).gameID;
         for (Connection con: connections.values()) {
             if (con.gameID == gameID) {
+                System.out.println("will broadcast to " + con.playerName);
                 include.add(con);
+            } else {
+                System.out.println("will not broadcast to " + con.playerName + " because their id is " + con.gameID);
             }
         }
 

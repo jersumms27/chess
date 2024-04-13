@@ -57,7 +57,7 @@ class GameServiceTest {
         CreateGameResponse createGameResponse = gameService.createGame(registerResponse.authToken(), createGameRequest);
         JoinGameRequest joinGameRequest = new JoinGameRequest("WHITE", createGameResponse.gameID());
         JoinGameResponse actual = gameService.joinGame(registerResponse.authToken(), joinGameRequest);
-        JoinGameResponse expected = new JoinGameResponse("");
+        //JoinGameResponse expected = new JoinGameResponse("");
     }
 
     @Test

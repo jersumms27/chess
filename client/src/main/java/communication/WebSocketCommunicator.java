@@ -26,10 +26,12 @@ public class WebSocketCommunicator extends Endpoint {
     ChessGame newGame;
     private boolean gameUpdated;
     private final Object lock;
+    private GameMenu menu;
 
-    public WebSocketCommunicator(String url) throws Exception {
+    public WebSocketCommunicator(String url, GameMenu menu) throws Exception {
         newGame = null;
         lock = new Object();
+        this.menu = menu;
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/connect");
@@ -54,6 +56,11 @@ public class WebSocketCommunicator extends Endpoint {
                         gameUpdated = true;
                         lock.notifyAll();
                     }
+                    try {
+                        setGame();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
 
                 }
             });
@@ -66,42 +73,32 @@ public class WebSocketCommunicator extends Endpoint {
     public void onOpen(javax.websocket.Session session, EndpointConfig endpointConfig) {
     }
 
-    public ChessGame joinPlayer(String auth, String playerName, int gameID, ChessGame.TeamColor playerColor) throws IOException {
+    public void joinPlayer(String auth, String playerName, int gameID, ChessGame.TeamColor playerColor) throws IOException {
         JoinGameCommand command = new JoinGameCommand(auth, playerName, gameID, playerColor);
         this.session.getBasicRemote().sendText(gson.toJson(command));
-
-        return newGame;
     }
 
-    public ChessGame joinObserver(String auth, String playerName, int gameID) throws IOException {
+    public void joinObserver(String auth, String playerName, int gameID) throws IOException {
         JoinObserverCommand command = new JoinObserverCommand(auth, playerName, gameID);
         this.session.getBasicRemote().sendText(gson.toJson(command));
-
-        return newGame;
     }
 
-    public ChessGame makeMove(String auth, String playerName, int gameID, ChessMove move) throws IOException {
-        MakeMoveCommand command = new MakeMoveCommand(auth, playerName, gameID, move);
+    public void makeMove(String auth, String playerName, int gameID, ChessMove move, String moveStr) throws IOException {
+        MakeMoveCommand command = new MakeMoveCommand(auth, playerName, gameID, move, moveStr);
         this.session.getBasicRemote().sendText(gson.toJson(command));
-
-        return newGame;
     }
 
-    public ChessGame leave(String auth, String playerName, int gameID) throws IOException {
+    public void leave(String auth, String playerName, int gameID) throws IOException {
         LeaveCommand command = new LeaveCommand(auth, playerName, gameID);
         this.session.getBasicRemote().sendText(gson.toJson(command));
-
-        return newGame;
     }
 
-    public ChessGame resign(String auth, String playerName, int gameID) throws IOException {
+    public void resign(String auth, String playerName, int gameID) throws IOException {
         ResignCommand command = new ResignCommand(auth, playerName, gameID);
         this.session.getBasicRemote().sendText(gson.toJson(command));
-
-        return newGame;
     }
 
-    public ChessGame getGame() throws InterruptedException {
+    public void setGame() throws InterruptedException {
         synchronized (lock) {
             while (!gameUpdated) {
                 lock.wait();
@@ -109,6 +106,8 @@ public class WebSocketCommunicator extends Endpoint {
         }
         gameUpdated = false;
 
-        return newGame;
+        //return newGame;
+        GameMenu.currentGame = newGame;
+        menu.redrawChessBoard();
     }
 }

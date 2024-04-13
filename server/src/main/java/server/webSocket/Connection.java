@@ -16,7 +16,7 @@ public class Connection {
     }
 
     public void send(String message) throws IOException {
-        System.out.println("sending message " + message + " to " + playerName);
+        //System.out.println("sending message " + message + " to " + playerName);
         session.getRemote().sendString(message);
     }
 }

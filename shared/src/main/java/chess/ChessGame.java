@@ -107,6 +107,20 @@ public class ChessGame {
         changeTeamTurn();
     }
 
+    public void makeMove(ChessMove move, TeamColor playerColor) throws InvalidMoveException {
+        ChessPosition startPos = move.getStartPosition();
+        ChessPiece piece = gameBoard.getPiece(startPos);
+
+        //check if invalid move
+        if (piece == null || piece.getTeamColor() != teamTurn || piece.getTeamColor() != playerColor || !validMoves(startPos).contains(move)) {
+            throw new InvalidMoveException("Invalid move");
+        }
+
+        //make the actual move
+        gameBoard.movePiece(move);
+        changeTeamTurn();
+    }
+
     /**
      * Determines if the given team is in check
      *
